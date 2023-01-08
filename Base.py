@@ -54,10 +54,12 @@ class Player(pygame.sprite.Sprite):
 
     def update(self, check=None, flag_change_image=False):
         move_side = False
+        any_move = False
         if not check:
             return
         if check[pygame.K_LEFT] or check[pygame.K_a]:
             move_side = True
+            any_move = True
             self.rect = self.rect.move(-self.speed, 0)
             if flag_change_image:
                 if self.key == 'side_stay_reverse':
@@ -70,6 +72,7 @@ class Player(pygame.sprite.Sprite):
                     self.key = 'side_stay_reverse'
         if check[pygame.K_RIGHT] or check[pygame.K_d]:
             move_side = True
+            any_move = True
             self.rect = self.rect.move(self.speed, 0)
             if flag_change_image:
                 if self.key == 'side_stay':
@@ -81,6 +84,7 @@ class Player(pygame.sprite.Sprite):
                 else:
                     self.key = 'side_stay'
         if check[pygame.K_UP] or check[pygame.K_w]:
+            any_move = True
             self.rect = self.rect.move(0, -self.speed)
             if flag_change_image and not move_side:
                 if self.key == 'back_stay':
@@ -92,6 +96,7 @@ class Player(pygame.sprite.Sprite):
                 else:
                     self.key = 'back_stay'
         if check[pygame.K_DOWN] or check[pygame.K_s]:
+            any_move = True
             self.rect = self.rect.move(0, self.speed)
             if flag_change_image and not move_side:
                 if self.key == 'front_stay':
@@ -102,6 +107,15 @@ class Player(pygame.sprite.Sprite):
                     self.key = 'front_stay'
                 else:
                     self.key = 'front_stay'
+        if not any_move:
+            if 'front' in self.key:
+                self.key = 'front_stay'
+            elif 'back' in self.key:
+                self.key = 'back_stay'
+            elif 'reverse' in self.key:
+                self.key = 'side_stay_reverse'
+            else:
+                self.key = 'side_stay'
         self.image = Player.images[self.key]
 
 
