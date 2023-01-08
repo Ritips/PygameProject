@@ -52,8 +52,10 @@ class Player(pygame.sprite.Sprite):
         self.image = image
         self.speed = player_speed
 
-    def move(self, check, flag_change_image=False):
+    def update(self, check=None, flag_change_image=False):
         move_side = False
+        if not check:
+            return
         if check[pygame.K_LEFT] or check[pygame.K_a]:
             move_side = True
             self.rect = self.rect.move(-self.speed, 0)
@@ -115,11 +117,11 @@ def start_game():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 exit()
-        if change_image_time == 5:
+        if change_image_time == 8:
             change_image_time = 0
-            player.move(pygame.key.get_pressed(), flag_change_image=True)
+            sprites.update(check=pygame.key.get_pressed(), flag_change_image=True)
         else:
-            player.move(pygame.key.get_pressed())
+            sprites.update(check=pygame.key.get_pressed())
         sprites.draw(screen)
         pygame.display.flip()
         clock.tick(FPS)
