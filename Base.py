@@ -1,60 +1,46 @@
 import pygame
 from SETTINGS import *
 from StartScreen import start_screen
-from LoadImage import load_image, load_level
+from player_images import player_images
 
 
 pygame.init()
-screen = pygame.display.set_mode(size)
 
+screen = pygame.display.set_mode(size)
 clock = pygame.time.Clock()
 sprites = pygame.sprite.Group()
 
 
 class Player(pygame.sprite.Sprite):
-    try:
-        front_stay = load_image('HeroFrontStay.png')
-        front_right_leg = load_image('HeroFrontRightLeg.png')
-        front_left_leg = load_image('HeroFrontLeftLeg.png')
-        side_left_leg = load_image('HeroSideLeftLeg.png')
-        side_right_leg = load_image('HeroSideRightLeg.png')
-        side_stay = load_image('HeroSideStay.png')
-        back_stay = load_image('HeroBackStay.png')
-        back_right_leg = load_image('HeroBackRightLeg.png')
-        back_left_leg = load_image('HeroBackLeftLeg.png')
-    except ValueError:
-        safe_image = pygame.Surface((player_width, player_height))
-        front_stay = front_right_leg = front_left_leg = side_stay = safe_image
-        side_left_leg, side_right_leg = back_stay = back_right_leg = safe_image
-        back_left_leg = safe_image
-        pygame.draw.circle(safe_image, 'red', (player_width // 2, player_height // 2), player_height // 2)
-    images = {
-        'front_stay': front_stay,
-        'front_right_leg': front_right_leg,
-        'front_left_leg': front_left_leg,
-        'side_left_leg': side_left_leg,
-        'side_right_leg': side_right_leg,
-        'side_stay': side_stay,
-        'back_stay': back_stay,
-        'back_right_leg': back_right_leg,
-        'back_left_leg': back_left_leg,
-        'side_left_leg_reverse': pygame.transform.flip(side_left_leg, True, False),
-        'side_right_leg_reverse': pygame.transform.flip(side_right_leg, True, False),
-        'side_stay_reverse': pygame.transform.flip(side_stay, True, False)
-    }
+    images = player_images
 
     def __init__(self, pos):
         super(Player, self).__init__()
         self.rect = pygame.Rect(pos[0], pos[1], player_width, player_height)
         self.key = 'front_stay'
+        self.weapon = 'punch'
         image = Player.images[self.key]
 
         self.image = image
         self.speed = player_speed
 
-    def update(self, check=None, flag_change_image=False):
-        move_side = False
-        any_move = False
+    def update(self, check=None, flag_change_image=0, check_punch=False):
+
+        if not check_punch and check:
+            if not flag_change_image % 8:
+                self.move(check=check, flag_change_image=True)
+            else:
+                self.move(check=check)
+        if check_punch and not flag_change_image % 4:
+            self.move(check=check)
+            self.hit(check=check, flag_change_image=True)
+        self.image = Player.images[self.key]
+
+    def hit(self, check=None, flag_change_image=False):
+        pass
+
+    def move(self, check=None, flag_change_image=False):
+        move_side = any_move = False
         if not check:
             return
         if check[pygame.K_LEFT] or check[pygame.K_a]:
@@ -118,12 +104,16 @@ class Player(pygame.sprite.Sprite):
                 self.key = 'side_stay'
         self.image = Player.images[self.key]
 
+    def update_weapon(self, weapon):
+        self.weapon = weapon
+
 
 player = Player((100, 100))
 sprites.add(player)
 
 
 def start_game():
+    global_const_check_punch = False
     change_image_time = 0
     while True:
         screen.fill(black)
@@ -131,11 +121,10 @@ def start_game():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 exit()
-        if change_image_time == 8:
+        if not change_image_time % 80:
             change_image_time = 0
-            sprites.update(check=pygame.key.get_pressed(), flag_change_image=True)
-        else:
-            sprites.update(check=pygame.key.get_pressed())
+        sprites.update(check=pygame.key.get_pressed(), flag_change_image=change_image_time,
+                       check_punch=global_const_check_punch)
         sprites.draw(screen)
         pygame.display.flip()
         clock.tick(FPS)
