@@ -21,7 +21,7 @@ class Player(pygame.sprite.Sprite):
 
     def update(self, check=None, flag_change_image=0):
         if check:
-            if not flag_change_image % 8 and any(check):
+            if not flag_change_image % 8:
                 self.move(check=check, flag_change_image=True)
             else:
                 self.move(check=check)
@@ -38,6 +38,14 @@ class Player(pygame.sprite.Sprite):
         move_side = any_move = False
         if not check:
             return
+        if not any(check):
+            if self.attack and 'side' in self.key:
+                if flag_change_image:
+                    if 'reverse' in self.key:
+                        self.hit_animation(reverse=True, stay=True)
+                    else:
+                        self.hit_animation(reverse=False, stay=True)
+                return
         if check[pygame.K_LEFT] or check[pygame.K_a]:
             move_side = True
             any_move = True
@@ -104,26 +112,42 @@ class Player(pygame.sprite.Sprite):
             else:
                 self.key = 'side_stay'
 
-    def hit_animation(self, reverse=False):
+    def hit_animation(self, reverse=False, stay=False):
         if self.weapon == 'punch':
-            if not reverse:
-                if self.key == 'side_stay_push1':
-                    self.key = 'side_right_leg_push1'
-                elif self.key == 'side_right_leg_push1':
-                    self.key = 'side_left_leg_push2'
-                elif self.key == 'side_left_leg_push2':
-                    self.key = 'side_stay_push1'
+            if not stay:
+                if not reverse:
+                    if self.key == 'side_stay_push1':
+                        self.key = 'side_right_leg_push1'
+                    elif self.key == 'side_right_leg_push1':
+                        self.key = 'side_left_leg_push2'
+                    elif self.key == 'side_left_leg_push2':
+                        self.key = 'side_stay_push1'
+                    else:
+                        self.key = 'side_stay_push1'
                 else:
-                    self.key = 'side_stay_push1'
+                    if self.key == 'side_stay_push1_reverse':
+                        self.key = 'side_right_leg_push1_reverse'
+                    elif self.key == 'side_right_leg_push1_reverse':
+                        self.key = 'side_left_leg_push2_reverse'
+                    elif self.key == 'side_left_leg_push2_reverse':
+                        self.key = 'side_stay_push1_reverse'
+                    else:
+                        self.key = 'side_stay_push1_reverse'
             else:
-                if self.key == 'side_stay_push1_reverse':
-                    self.key = 'side_right_leg_push1_reverse'
-                elif self.key == 'side_right_leg_push1_reverse':
-                    self.key = 'side_left_leg_push2_reverse'
-                elif self.key == 'side_left_leg_push2_reverse':
-                    self.key = 'side_stay_push1_reverse'
+                if not reverse:
+                    if self.key == 'side_stay_push1':
+                        self.key = 'side_stay_push2'
+                    elif self.key == 'side_stay_push2':
+                        self.key = 'side_stay_push1'
+                    else:
+                        self.key = 'side_stay_push1'
                 else:
-                    self.key = 'side_stay_push1_reverse'
+                    if self.key == 'side_stay_push1_reverse':
+                        self.key = 'side_stay_push2_reverse'
+                    elif self.key == 'side_stay_push2_reverse':
+                        self.key = 'side_stay_push1_reverse'
+                    else:
+                        self.key = 'side_stay_push1_reverse'
 
     def update_weapon(self, weapon):
         self.weapon = weapon
