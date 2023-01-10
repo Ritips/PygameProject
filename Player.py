@@ -11,11 +11,12 @@ class Player(pygame.sprite.Sprite):
         self.rect = pygame.Rect(pos[0], pos[1], player_width, player_height)
         self.key = 'front_stay'
 
-        # weapon constants
+        # hero constants
         self.weapon = 'punch'
         self.damage = 5
         self.kd = 0
         self.kd_reset = 40
+        self.health = 60
         self.attack = False
 
         image = Player.images[self.key]
