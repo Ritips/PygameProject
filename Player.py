@@ -11,20 +11,30 @@ class Player(pygame.sprite.Sprite):
         self.rect = pygame.Rect(pos[0], pos[1], player_width, player_height)
         self.key = 'front_stay'
         self.weapon = 'punch'
+        self.kd = 0
+        self.kd_reset = 40
+        self.attack = False
         image = Player.images[self.key]
 
         self.image = image
         self.speed = player_speed
 
-    def update(self, check=None, flag_change_image=0, check_punch=False):
+    def update(self, check=None, flag_change_image=0):
         if check:
             if not flag_change_image % 8 and any(check):
-                self.move(check=check, flag_change_image=True, check_punch=check_punch)
+                self.move(check=check, flag_change_image=True)
             else:
                 self.move(check=check)
+        if not self.kd and self.attack:
+            self.kd = 1
+        elif self.kd == self.kd_reset:
+            self.attack = False
+            self.kd = 0
+        elif self.kd > 0:
+            self.kd += 1
         self.image = Player.images[self.key]
 
-    def move(self, check=None, flag_change_image=False, check_punch=False):
+    def move(self, check=None, flag_change_image=False):
         move_side = any_move = False
         if not check:
             return
@@ -33,7 +43,7 @@ class Player(pygame.sprite.Sprite):
             any_move = True
             self.rect = self.rect.move(-self.speed, 0)
             if flag_change_image:
-                if not check_punch:
+                if not self.attack:
                     if self.key == 'side_stay_reverse':
                         self.key = 'side_right_leg_reverse'
                     elif self.key == 'side_right_leg_reverse':
@@ -43,20 +53,13 @@ class Player(pygame.sprite.Sprite):
                     else:
                         self.key = 'side_stay_reverse'
                 else:
-                    if self.key == 'side_stay_reverse':
-                        self.key = 'srl_pl3_reverse'
-                    elif self.key == 'srl_pl3_reverse':
-                        self.key = 'sll_pr3_reverse'
-                    elif self.key == 'sll_pr3_reverse':
-                        self.key = 'side_stay_reverse'
-                    else:
-                        self.key = 'side_stay_reverse'
+                    self.hit_animation(reverse=True)
         if check[pygame.K_RIGHT] or check[pygame.K_d]:
             move_side = True
             any_move = True
             self.rect = self.rect.move(self.speed, 0)
             if flag_change_image:
-                if not check_punch:
+                if not self.attack:
                     if self.key == 'side_stay':
                         self.key = 'side_right_leg'
                     elif self.key == 'side_right_leg':
@@ -66,14 +69,7 @@ class Player(pygame.sprite.Sprite):
                     else:
                         self.key = 'side_stay'
                 else:
-                    if self.key == 'side_stay':
-                        self.key = 'srl_pl3'
-                    elif self.key == 'srl_pl3':
-                        self.key = 'sll_pr3'
-                    elif self.key == 'sll_pr3':
-                        self.key = 'side_stay'
-                    else:
-                        self.key = 'side_stay'
+                    self.hit_animation(reverse=False)
         if check[pygame.K_UP] or check[pygame.K_w]:
             any_move = True
             self.rect = self.rect.move(0, -self.speed)
@@ -98,7 +94,7 @@ class Player(pygame.sprite.Sprite):
                     self.key = 'front_stay'
                 else:
                     self.key = 'front_stay'
-        if not any_move and not check_punch:
+        if not any_move:
             if 'front' in self.key:
                 self.key = 'front_stay'
             elif 'back' in self.key:
@@ -108,5 +104,32 @@ class Player(pygame.sprite.Sprite):
             else:
                 self.key = 'side_stay'
 
+    def hit_animation(self, reverse=False):
+        if self.weapon == 'punch':
+            if not reverse:
+                if self.key == 'side_stay_push1':
+                    self.key = 'side_right_leg_push1'
+                elif self.key == 'side_right_leg_push1':
+                    self.key = 'side_left_leg_push2'
+                elif self.key == 'side_left_leg_push2':
+                    self.key = 'side_stay_push1'
+                else:
+                    self.key = 'side_stay_push1'
+            else:
+                if self.key == 'side_stay_push1_reverse':
+                    self.key = 'side_right_leg_push1_reverse'
+                elif self.key == 'side_right_leg_push1_reverse':
+                    self.key = 'side_left_leg_push2_reverse'
+                elif self.key == 'side_left_leg_push2_reverse':
+                    self.key = 'side_stay_push1_reverse'
+                else:
+                    self.key = 'side_stay_push1_reverse'
+
     def update_weapon(self, weapon):
         self.weapon = weapon
+
+    def check_kd(self):
+        return self.kd
+
+    def func_attack(self, event):
+        self.attack = event

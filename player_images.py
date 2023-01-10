@@ -12,25 +12,15 @@ back_stay = load_image('HeroBackStay.png')
 back_right_leg = load_image('HeroBackRightLeg.png')
 back_left_leg = load_image('HeroBackLeftLeg.png')
 
-side_stay_punch_left_1 = load_image('HeroStayPunchLeft1.png')
-side_stay_punch_left_2 = load_image('HeroStayPunchLeft2.png')
-side_stay_punch_left_3 = load_image('HeroStayPunchLeft3.png')
-side_left_leg_punch_left_1 = load_image('HeroLeftLegPunchLeft1.png')
-side_left_leg_punch_left_2 = load_image('HeroLeftLegPunchLeft2.png')
-side_left_leg_punch_left_3 = load_image('HeroLeftLegPunchLeft3.png')
-side_right_leg_punch_left_1 = load_image('HeroRightLegPunchLeft1.png')
-side_right_leg_punch_left_2 = load_image('HeroRightLegPunchLeft2.png')
-side_right_leg_punch_left_3 = load_image('HeroRightLegPunchLeft1.png')
+side_stay_push1 = load_image('HeroSideStayPush1.png')
+side_stay_push2 = load_image('HeroSideStayPush2.png')
 
-side_stay_punch_right_1 = load_image('HeroStayPunchRight1.png')
-side_stay_punch_right_2 = load_image('HeroStayPunchRight2.png')
-side_stay_punch_right_3 = load_image('HeroStayPunchRight3.png')
-side_left_leg_punch_right_1 = load_image('HeroLeftLegPunchRight1.png')
-side_left_leg_punch_right_2 = load_image('HeroLeftLegPunchRight2.png')
-side_left_leg_punch_right_3 = load_image('HeroLeftLegPunchRight3.png')
-side_right_leg_punch_right_1 = load_image('HeroRightLegPunchRight1.png')
-side_right_leg_punch_right_2 = load_image('HeroRightLegPunchRight2.png')
-side_right_leg_punch_right_3 = load_image('HeroRightLegPunchRight3.png')
+side_left_leg_push1 = load_image('HeroSideLeftLegPush1.png')
+side_left_leg_push2 = load_image('HeroSideLeftLegPush2.png')
+
+side_right_leg_push1 = load_image('HeroSideRightLegPush1.png')
+side_right_leg_push2 = load_image('HeroSideRightLegPush2.png')
+
 
 player_images = {
     'front_stay': front_stay,
@@ -45,40 +35,19 @@ player_images = {
     'side_left_leg_reverse': pygame.transform.flip(side_left_leg, True, False),
     'side_right_leg_reverse': pygame.transform.flip(side_right_leg, True, False),
     'side_stay_reverse': pygame.transform.flip(side_stay, True, False),
-    'side_stay_punch_left_1': side_stay_punch_left_1,
-    'side_stay_punch_left_2': side_stay_punch_left_2,
-    'side_stay_punch_left_3': side_stay_punch_left_3,
-    'side_left_leg_punch_left_1': side_left_leg_punch_left_1,
-    'side_left_leg_punch_left_2': side_left_leg_punch_left_2,
-    'side_left_leg_punch_left_3': side_left_leg_punch_left_3,
-    'side_right_leg_punch_left_1': side_right_leg_punch_left_1,
-    'side_right_leg_punch_left_2': side_right_leg_punch_left_2,
-    'side_right_leg_punch_left_3': side_right_leg_punch_left_3,
-    'side_stay_punch_right_1': side_stay_punch_right_1,
-    'side_stay_punch_right_2': side_stay_punch_right_2,
-    'side_stay_punch_right_3': side_stay_punch_right_3,
-    'side_left_leg_punch_right_1': side_left_leg_punch_right_1,
-    'side_left_leg_punch_right_2': side_left_leg_punch_right_2,
-    'side_left_leg_punch_right_3': side_left_leg_punch_right_3,
-    'side_right_leg_punch_right_1': side_right_leg_punch_right_1,
-    'side_right_leg_punch_right_2': side_right_leg_punch_right_2,
-    'side_right_leg_punch_right_3': side_right_leg_punch_right_3,
-    'side_stay_punch_left_1_reverse': pygame.transform.flip(side_stay_punch_left_1, True, False),
-    'side_stay_punch_left_2_reverse': pygame.transform.flip(side_stay_punch_left_2, True, False),
-    'side_stay_punch_left_3_reverse': pygame.transform.flip(side_stay_punch_left_3, True, False),
-    'side_left_leg_punch_left_1_reverse': pygame.transform.flip(side_left_leg_punch_left_1, True, False),
-    'side_left_leg_punch_left_2_reverse': pygame.transform.flip(side_left_leg_punch_left_2, True, False),
-    'side_left_leg_punch_left_3_reverse': pygame.transform.flip(side_left_leg_punch_left_3, True, False),
-    'side_right_leg_punch_left_1_reverse': pygame.transform.flip(side_right_leg_punch_left_1, True, False),
-    'side_right_leg_punch_left_2_reverse': pygame.transform.flip(side_right_leg_punch_left_2, True, False),
-    'side_right_leg_punch_left_3_reverse': pygame.transform.flip(side_right_leg_punch_left_3, True, False),
-    'side_stay_punch_right_1_reverse': pygame.transform.flip(side_stay_punch_right_1, True, False),
-    'side_stay_punch_right_2_reverse': pygame.transform.flip(side_stay_punch_right_2, True, False),
-    'side_stay_punch_right_3_reverse': pygame.transform.flip(side_stay_punch_right_3, True, False),
-    'side_left_leg_punch_right_1_reverse': pygame.transform.flip(side_left_leg_punch_right_1, True, False),
-    'side_left_leg_punch_right_2_reverse': pygame.transform.flip(side_left_leg_punch_right_2, True, False),
-    'side_left_leg_punch_right_3_reverse': pygame.transform.flip(side_left_leg_punch_right_3, True, False),
-    'side_right_leg_punch_right_1_reverse': pygame.transform.flip(side_right_leg_punch_right_1, True, False),
-    'side_right_leg_punch_right_2_reverse': pygame.transform.flip(side_right_leg_punch_right_2, True, False),
-    'side_right_leg_punch_right_3_reverse': pygame.transform.flip(side_right_leg_punch_right_3, True, False)
+
+    'side_stay_push1': side_stay_push1,
+    'side_stay_push2': side_stay_push2,
+    'side_stay_push1_reverse': pygame.transform.flip(side_stay_push1, True, False),
+    'side_stay_push2_reverse': pygame.transform.flip(side_stay_push2, True, False),
+
+    'side_left_leg_push1': side_left_leg_push1,
+    'side_left_leg_push2': side_left_leg_push2,
+    'side_left_leg_push1_reverse': pygame.transform.flip(side_left_leg_push1, True, False),
+    'side_left_leg_push2_reverse': pygame.transform.flip(side_left_leg_push2, True, False),
+
+    'side_right_leg_push1': side_right_leg_push1,
+    'side_right_leg_push2': side_right_leg_push2,
+    'side_right_leg_push1_reverse': pygame.transform.flip(side_right_leg_push1, True, False),
+    'side_right_leg_push2_reverse': pygame.transform.flip(side_right_leg_push2, True, False)
 }
