@@ -10,12 +10,15 @@ class Player(pygame.sprite.Sprite):
         super(Player, self).__init__()
         self.rect = pygame.Rect(pos[0], pos[1], player_width, player_height)
         self.key = 'front_stay'
+
+        # weapon constants
         self.weapon = 'punch'
+        self.damage = 5
         self.kd = 0
         self.kd_reset = 40
         self.attack = False
-        image = Player.images[self.key]
 
+        image = Player.images[self.key]
         self.image = image
         self.speed = player_speed
 
