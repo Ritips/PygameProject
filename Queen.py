@@ -21,8 +21,22 @@ class Queen(pygame.sprite.Sprite):
         self.image = image
         self.speed = 2
 
-    def update(self, **kwargs):
-        pass
+    def update(self, flag_change_image=0, **kwargs):
+        if not flag_change_image % 8:
+            self.move(flag_change_image=True)
+        self.image = Queen.images[self.key]
 
-    def move(self):
-        pass
+    def move(self, flag_change_image=False):
+        if flag_change_image:
+            if self.key == 'front_stay':
+                self.key = 'side_stay'
+            elif self.key == 'side_stay':
+                self.key = 'side_stay_reverse'
+            elif self.key == 'side_stay_reverse':
+                self.key = 'back_stay'
+            elif self.key == 'back_stay':
+                self.key = 'back_step'
+            elif self.key == 'back_step':
+                self.key = 'front_stay'
+            else:
+                self.key = 'front_stay'

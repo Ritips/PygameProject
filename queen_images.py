@@ -39,4 +39,4 @@ queen_images = {
 }
 
 
-queen_func_scale_image(queen_images)
+#  queen_func_scale_image(queen_images)

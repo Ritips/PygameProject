@@ -23,7 +23,7 @@ class Player(pygame.sprite.Sprite):
         self.image = image
         self.speed = player_speed
 
-    def update(self, check=None, flag_change_image=0):
+    def update(self, check=None, flag_change_image=0, **kwargs):
         if check:
             if not flag_change_image % 8:
                 self.move(check=check, flag_change_image=True)
