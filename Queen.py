@@ -49,3 +49,9 @@ class Queen(pygame.sprite.Sprite):
         if pygame.sprite.collide_rect(self, damage_box):
             self.health -= dmg_dealer.damage
             print(self.health)
+
+
+class Meteor(pygame.sprite.Sprite):
+    def __init__(self, pos):
+        super(Meteor, self).__init__()
+        self.rect = pygame.Rect(pos[0])

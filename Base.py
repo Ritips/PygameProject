@@ -3,6 +3,7 @@ from SETTINGS import *
 from StartScreen import start_screen, sprites, enemies
 from Player import Player
 from Queen import Queen
+from Slime import Slime
 
 
 pygame.init()
@@ -11,9 +12,11 @@ screen = pygame.display.set_mode(size)
 clock = pygame.time.Clock()
 
 player = Player((100, 100))
+slime = Slime((100, 100))
 queen = Queen((200, 200))
 sprites.add(player)
 enemies.add(queen)
+enemies.add(slime)
 sprites.add(enemies)
 
 player.set_self_sprite(enemies)
