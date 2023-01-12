@@ -13,4 +13,3 @@ font_size = int(50 * width / 800)
 black = (0, 0, 0)
 white = (255, 255, 255)
 btn_start_game_color = (0, 0, 200)
-

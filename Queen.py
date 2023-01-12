@@ -21,9 +21,12 @@ class Queen(pygame.sprite.Sprite):
         self.image = image
         self.speed = 2
 
-    def update(self, flag_change_image=0, **kwargs):
+    def update(self, flag_change_image=0, dealer_damage=None, **kwargs):
         if not flag_change_image % 8:
             self.move(flag_change_image=True)
+        if dealer_damage:
+            self.get_hit(dealer_damage)
+
         self.image = Queen.images[self.key]
 
     def move(self, flag_change_image=False):
@@ -40,3 +43,9 @@ class Queen(pygame.sprite.Sprite):
                 self.key = 'front_stay'
             else:
                 self.key = 'front_stay'
+
+    def get_hit(self, dmg_dealer):
+        damage_box = dmg_dealer.damage_box
+        if pygame.sprite.collide_rect(self, damage_box):
+            self.health -= dmg_dealer.damage
+            print(self.health)

@@ -1,10 +1,17 @@
 from LoadImage import load_image
 import pygame
+from SETTINGS import width, height
 
 
-def queen_func_scale_image(dictionary):
+def transform_player_image(image):
+    x, y = image.get_size()
+    x, y = int(width * (x + 10) / 800), int(height * (y + 10) / 600)
+    return pygame.transform.scale(image, (x, y))
+
+
+def transform_images(dictionary):
     for key in dictionary:
-        dictionary[key] = pygame.transform.scale(dictionary[key], (70, 70))
+        dictionary[key] = transform_player_image(dictionary[key])
 
 
 queen_side_stay = load_image('QueenSideStay.png')
@@ -38,5 +45,4 @@ queen_images = {
     'particle2': queen_attack_particle2,
 }
 
-
-#  queen_func_scale_image(queen_images)
+transform_images(queen_images)

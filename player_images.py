@@ -1,5 +1,17 @@
 from LoadImage import load_image
+from SETTINGS import width, height
 import pygame
+
+
+def transform_player_image(image):
+    x, y = image.get_size()
+    x, y = int(width * x / 800), int(height * y / 600)
+    return pygame.transform.scale(image, (x, y))
+
+
+def transform_images(dictionary):
+    for key in dictionary:
+        dictionary[key] = transform_player_image(dictionary[key])
 
 
 front_stay = load_image('HeroFrontStay.png')
@@ -51,3 +63,5 @@ player_images = {
     'side_right_leg_push1_reverse': pygame.transform.flip(side_right_leg_push1, True, False),
     'side_right_leg_push2_reverse': pygame.transform.flip(side_right_leg_push2, True, False)
 }
+
+transform_images(player_images)

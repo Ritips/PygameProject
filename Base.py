@@ -1,6 +1,6 @@
 import pygame
 from SETTINGS import *
-from StartScreen import start_screen
+from StartScreen import start_screen, sprites, enemies
 from Player import Player
 from Queen import Queen
 
@@ -9,14 +9,16 @@ pygame.init()
 
 screen = pygame.display.set_mode(size)
 clock = pygame.time.Clock()
-sprites = pygame.sprite.Group()
-enemies = pygame.sprite.Group()
 
 player = Player((100, 100))
-sprites.add(player)
 queen = Queen((200, 200))
+sprites.add(player)
 enemies.add(queen)
 sprites.add(enemies)
+
+player.set_self_sprite(enemies)
+damage_sprite = player.get_damage_box()  # visible check damage sprite
+sprites.add(damage_sprite)
 
 
 def start_game():
