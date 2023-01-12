@@ -23,34 +23,40 @@ class Slime(pygame.sprite.Sprite):
 
     def move(self, flag_change_image):
         if flag_change_image:
-            if self.key == 'move1':
-                self.key = 'move2'
-            elif self.key == 'move2':
-                self.key = 'move3'
-            elif self.key == 'move3':
-                self.key = 'move4'
-            elif self.key == 'move4':
-                self.key = 'move1'
-            elif self.key == 'attack1':
-                self.key = 'attack2'
-            elif self.key == 'attack2':
-                self.key = 'attack3'
-            elif self.key == 'attack3':
-                self.key = 'move1'
-            elif self.key == 'move1_reverse':
-                self.key = 'move2_reverse'
-            elif self.key == 'move2_reverse':
-                self.key = 'move3_reverse'
-            elif self.key == 'move3_reverse':
-                self.key = 'move4_reverse'
-            elif self.key == 'move4_reverse':
-                self.key = 'move1_reverse'
-            elif self.key == 'attack1_reverse':
-                self.key = 'attack2_reverse'
-            elif self.key == 'attack2_reverse':
-                self.key = 'attack3_reverse'
-            elif self.key == 'attack3_reverse':
-                self.key = 'move1_reverse'
+            if not self.attack:
+                if self.key == 'move1':
+                    self.key = 'move2'
+                elif self.key == 'move2':
+                    self.key = 'move3'
+                elif self.key == 'move3':
+                    self.key = 'move4'
+                elif self.key == 'move4':
+                    self.key = 'move1'
+                else:
+                    self.key = 'move1'
+            else:
+                if self.key == 'attack1':
+                    self.key = 'attack2'
+                elif self.key == 'attack2':
+                    self.key = 'attack3'
+                elif self.key == 'attack3':
+                    self.key = 'move1'
+                elif self.key == 'move1_reverse':
+                    self.key = 'move2_reverse'
+                elif self.key == 'move2_reverse':
+                    self.key = 'move3_reverse'
+                elif self.key == 'move3_reverse':
+                    self.key = 'move4_reverse'
+                elif self.key == 'move4_reverse':
+                    self.key = 'move1_reverse'
+                elif self.key == 'attack1_reverse':
+                    self.key = 'attack2_reverse'
+                elif self.key == 'attack2_reverse':
+                    self.key = 'attack3_reverse'
+                elif self.key == 'attack3_reverse':
+                    self.key = 'move1_reverse'
+                else:
+                    self.key = 'attack1'
         if random.randint(0, 1):
             self.rect = self.rect.move(random.randint(0, slime_speed) - random.randint(0, slime_speed),
                                        random.randint(0, slime_speed) - random.randint(0, slime_speed))
