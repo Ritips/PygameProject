@@ -9,6 +9,12 @@ slime_speed = int(1 * height / 600)
 slime_width = int(15 * width // 800)
 slime_height = int(15 * height // 600)
 
+meteor_width = int(34 * width / 800)
+meteor_height = int(34 * height / 600)
+magic_ball_width = int(20 * width / 800)
+magic_ball_height = int(11 * height / 600)
+
+
 button_width = int(200 * width / 800)
 button_height = int(50 * height / 600)
 
