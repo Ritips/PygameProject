@@ -5,7 +5,6 @@ from queen_images import queen_images
 from magic_ball_images import magic_ball_images
 from meteor_images import meteor_images
 import random
-from math import acos, pi, sqrt
 
 
 class Queen(pygame.sprite.Sprite):
