@@ -48,6 +48,9 @@ class Queen(pygame.sprite.Sprite):
         self.health_bar.image = image
 
     def update(self, flag_change_image=0, dmg_dealer=None, **kwargs):
+        if not self.status_self_bar_show and not self.health:
+            self.kill()
+            return
         if not flag_change_image % 8:
             self.move(flag_change_image=True)
         if dmg_dealer:
@@ -80,7 +83,12 @@ class Queen(pygame.sprite.Sprite):
         damage_box = dmg_dealer.damage_box
         if pygame.sprite.collide_rect(self.hit_box, damage_box):
             self.health -= dmg_dealer.damage
-            self.status_self_bar_show = 1
+            if self.health > 0:
+                self.status_self_bar_show = 1
+            else:
+                self.health = 0
+                self.status_self_bar_show = False
+                self.kill(), self.hit_box.kill(), self.health_bar.kill()
 
     def show_health_bar(self):
         if not sprites.has(self.health_bar) and self.status_self_bar_show:

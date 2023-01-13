@@ -1,4 +1,4 @@
-size = width, height = 800, 600
+size = width, height = 1280, 720
 
 FPS = 60
 
