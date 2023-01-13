@@ -7,11 +7,10 @@ from player_images import player_images
 class Player(pygame.sprite.Sprite):
     images = player_images
 
-    def __init__(self, pos, sprite=None):
+    def __init__(self, pos):
         super(Player, self).__init__(group_player, sprites)
         self.rect = pygame.Rect(pos[0], pos[1], player_width, player_height)
         self.key = 'front_stay'
-        self.sprite = sprite
 
         # hero constants
         self.weapon = 'punch'
@@ -196,12 +195,8 @@ class Player(pygame.sprite.Sprite):
 
     def func_attack(self, event):
         self.attack = event
-        if self.sprite:
-            if pygame.sprite.spritecollideany(self.damage_box, self.sprite):
-                self.sprite.update(dmg_dealer=self)
-
-    def set_self_sprite(self, sprite):
-        self.sprite = sprite
+        if pygame.sprite.spritecollideany(self.damage_box, enemies):
+            enemies.update(dmg_dealer=self)
 
     def get_damage_box(self):
         return self.damage_box

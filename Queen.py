@@ -27,12 +27,6 @@ class Queen(pygame.sprite.Sprite):
         self.attack = False
         self.speed = 2
 
-        self.hit_box = pygame.sprite.Sprite()
-        self.hit_box.rect = pygame.Rect(pos[0], pos[1], player_width, player_height)
-        image = pygame.Surface((player_width, player_height), pygame.SRCALPHA)
-        pygame.draw.rect(image, black, (0, 0, player_width, player_height))
-        self.hit_box.image = image
-
         self.health_bar = pygame.sprite.Sprite()
         self.health_bar.rect = pygame.Rect(pos[0], pos[1] - (10 * height // 600), player_width, hp_bar_height)
         self.draw_health_bar()
@@ -81,14 +75,14 @@ class Queen(pygame.sprite.Sprite):
 
     def get_hit(self, dmg_dealer):
         damage_box = dmg_dealer.damage_box
-        if pygame.sprite.collide_rect(self.hit_box, damage_box):
+        if pygame.sprite.collide_rect(self, damage_box):
             self.health -= dmg_dealer.damage
             if self.health > 0:
                 self.status_self_bar_show = 1
             else:
                 self.health = 0
                 self.status_self_bar_show = False
-                self.kill(), self.hit_box.kill(), self.health_bar.kill()
+                self.kill(), self.health_bar.kill()
 
     def show_health_bar(self):
         if not sprites.has(self.health_bar) and self.status_self_bar_show:

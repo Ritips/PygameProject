@@ -16,9 +16,7 @@ player = Player((100, 100))
 slime = Slime((100, 100))
 queen = Queen((200, 200))
 
-player.set_self_sprite(enemies)
 damage_sprite = player.get_damage_box()  # visible check damage sprite
-damage_sprite2 = queen.hit_box
 #  sprites.add(damage_sprite)
 #  sprites.add(damage_sprite2)
 
