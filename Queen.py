@@ -1,3 +1,4 @@
+from LoadLevel import *
 import pygame
 from SETTINGS import *
 from queen_images import queen_images
@@ -9,29 +10,55 @@ class Queen(pygame.sprite.Sprite):
     images = queen_images
 
     def __init__(self, pos):
-        super(Queen, self).__init__()
+        super(Queen, self).__init__(enemies, sprites)
         self.rect = pygame.Rect(pos[0], pos[1], player_width, player_height)
         self.key = 'front_stay'
         self.bullets = pygame.sprite.Group()  # for some bullets like magic ball and meteor
         self.allies = pygame.sprite.Group()  # to spawn more enemies
+        image = Queen.images[self.key]
+        self.image = image
 
         # queen constants
+        self.max_health = 500
         self.health = 500
         self.damage = 100
         self.kd = 0
         self.kd_reset = 120
         self.attack = False
-
-        image = Queen.images[self.key]
-        self.image = image
         self.speed = 2
 
-    def update(self, flag_change_image=0, dealer_damage=None, **kwargs):
+        self.hit_box = pygame.sprite.Sprite()
+        self.hit_box.rect = pygame.Rect(pos[0], pos[1], player_width, player_height)
+        image = pygame.Surface((player_width, player_height), pygame.SRCALPHA)
+        pygame.draw.rect(image, black, (0, 0, player_width, player_height))
+        self.hit_box.image = image
+
+        self.health_bar = pygame.sprite.Sprite()
+        self.health_bar.rect = pygame.Rect(pos[0], pos[1] - (5 * height // 600), player_width, hp_bar_height)
+        self.draw_health_bar()
+
+        self.kd_self_bar_show = 100
+        self.status_self_bar_show = False
+
+    def draw_health_bar(self):
+        image = pygame.Surface((player_width, hp_bar_height), pygame.SRCALPHA)
+        length_line = player_width * self.health // self.max_health
+        pygame.draw.rect(image, red, (0, 0, length_line, hp_bar_height))
+        pygame.draw.rect(image, black, (0, 0, player_width, hp_bar_height), 1)
+        self.health_bar.image = image
+
+    def update(self, flag_change_image=0, dmg_dealer=None, **kwargs):
         if not flag_change_image % 8:
             self.move(flag_change_image=True)
-        if dealer_damage:
-            self.get_hit(dealer_damage)
-
+        if dmg_dealer:
+            self.get_hit(dmg_dealer)
+        if self.status_self_bar_show:
+            if self.status_self_bar_show == self.kd_self_bar_show:
+                self.status_self_bar_show = False
+                self.health_bar.remove(sprites)
+            else:
+                self.status_self_bar_show += 1
+            self.show_health_bar()
         self.image = Queen.images[self.key]
 
     def move(self, flag_change_image=False):
@@ -51,9 +78,14 @@ class Queen(pygame.sprite.Sprite):
 
     def get_hit(self, dmg_dealer):
         damage_box = dmg_dealer.damage_box
-        if pygame.sprite.collide_rect(self, damage_box):
+        if pygame.sprite.collide_rect(self.hit_box, damage_box):
             self.health -= dmg_dealer.damage
-            print(self.health)
+            self.status_self_bar_show = 1
+
+    def show_health_bar(self):
+        if not sprites.has(self.health_bar) and self.status_self_bar_show:
+            sprites.add(self.health_bar)
+        self.draw_health_bar()
 
 
 class Meteor(pygame.sprite.Sprite):

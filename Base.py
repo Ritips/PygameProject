@@ -1,6 +1,7 @@
+from LoadLevel import *
 import pygame
 from SETTINGS import *
-from StartScreen import start_screen, sprites, enemies
+from StartScreen import start_screen
 from Player import Player
 from Queen import Queen
 from Slime import Slime
@@ -14,14 +15,12 @@ clock = pygame.time.Clock()
 player = Player((100, 100))
 slime = Slime((100, 100))
 queen = Queen((200, 200))
-sprites.add(player)
-enemies.add(queen)
-enemies.add(slime)
-sprites.add(enemies)
 
 player.set_self_sprite(enemies)
 damage_sprite = player.get_damage_box()  # visible check damage sprite
-sprites.add(damage_sprite)
+damage_sprite2 = queen.hit_box
+#  sprites.add(damage_sprite)
+#  sprites.add(damage_sprite2)
 
 
 def start_game():

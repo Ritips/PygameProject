@@ -7,8 +7,6 @@ pygame.font.init()
 screen = pygame.display.set_mode(size)
 clock = pygame.time.Clock()
 start_sprites = pygame.sprite.Group()
-sprites = pygame.sprite.Group()
-enemies = pygame.sprite.Group()
 
 
 class ButtonStartGame(pygame.sprite.Sprite):

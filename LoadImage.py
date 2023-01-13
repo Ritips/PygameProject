@@ -22,10 +22,3 @@ def load_image(name, color_key=None):
     except FileNotFoundError:
         raise ValueError(f'File {fullname} not found')
 
-
-def load_level(filename):
-    filename = "data/" + filename
-    with open(filename, 'r') as mapFile:
-        read = list(map(str.strip, mapFile.readlines()))
-    max_width = max(map(len, read))
-    return list(map(lambda x: x.ljust(max_width, '.'), read))

@@ -1,3 +1,4 @@
+from LoadLevel import *
 import pygame
 from SETTINGS import *
 from player_images import player_images
@@ -7,7 +8,7 @@ class Player(pygame.sprite.Sprite):
     images = player_images
 
     def __init__(self, pos, sprite=None):
-        super(Player, self).__init__()
+        super(Player, self).__init__(group_player, sprites)
         self.rect = pygame.Rect(pos[0], pos[1], player_width, player_height)
         self.key = 'front_stay'
         self.sprite = sprite
@@ -178,21 +179,17 @@ class Player(pygame.sprite.Sprite):
 
         dx, dy = Player.images[self.key].get_size()
         if 'reverse' in self.key and 'side' in self.key:
-            dx, w = dx - 15, w + 15
             dx, w, h = dx * width // 800, w * width // 800, h * height // 600
-            self.damage_box.rect = pygame.Rect(x - dx, y, w, h)
+            self.damage_box.rect = pygame.Rect(x - 2 * dx, y, w, h)
         elif 'side' in self.key:
-            dx, w = dx - 30, w + 30
             dx, w, h = dx * width // 800, w * width // 800, h * height // 600
             self.damage_box.rect = pygame.Rect(x + dx, y, w, h)
         elif 'front' in self.key:
-            dy = dy - 15
             dy, w, h = dy * height // 600, w * width // 800, h * h // 600
-            self.damage_box.rect = pygame.Rect(x, y + dy, h, w)
+            self.damage_box.rect = pygame.Rect(x - (dx // 2), y + dy, h, w)
         elif 'back' in self.key:
-            dy = dy - 10
             dy, w, h = dy * height // 600, w * width // 800, h * height // 600
-            self.damage_box.rect = pygame.Rect(x, y - dy, h, w)
+            self.damage_box.rect = pygame.Rect(x - (dx // 2), y - dy, h, w)
 
     def check_kd(self):
         return self.kd
@@ -201,7 +198,7 @@ class Player(pygame.sprite.Sprite):
         self.attack = event
         if self.sprite:
             if pygame.sprite.spritecollideany(self.damage_box, self.sprite):
-                self.sprite.update(dealer_damage=self)
+                self.sprite.update(dmg_dealer=self)
 
     def set_self_sprite(self, sprite):
         self.sprite = sprite
