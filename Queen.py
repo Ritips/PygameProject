@@ -34,7 +34,7 @@ class Queen(pygame.sprite.Sprite):
         self.hit_box.image = image
 
         self.health_bar = pygame.sprite.Sprite()
-        self.health_bar.rect = pygame.Rect(pos[0], pos[1] - (5 * height // 600), player_width, hp_bar_height)
+        self.health_bar.rect = pygame.Rect(pos[0], pos[1] - (10 * height // 600), player_width, hp_bar_height)
         self.draw_health_bar()
 
         self.kd_self_bar_show = 100
