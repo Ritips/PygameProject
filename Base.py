@@ -15,10 +15,7 @@ clock = pygame.time.Clock()
 player = Player((100, 100))
 slime = Slime((100, 100))
 queen = Queen((200, 200))
-
-damage_sprite = player.get_damage_box()  # visible check damage sprite
-#  sprites.add(damage_sprite)
-#  sprites.add(damage_sprite2)
+queen.set_target(player)
 
 
 def start_game():

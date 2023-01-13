@@ -12,3 +12,5 @@ def load_level(filename):
 sprites = pygame.sprite.Group()
 enemies = pygame.sprite.Group()
 group_player = pygame.sprite.Group()
+bullets = pygame.sprite.Group()
+constructions = pygame.sprite.Group()

@@ -4,14 +4,17 @@ from SETTINGS import *
 from queen_images import queen_images
 from magic_ball_images import magic_ball_images
 from meteor_images import meteor_images
+import random
+from math import acos, pi, sqrt
 
 
 class Queen(pygame.sprite.Sprite):
     images = queen_images
 
-    def __init__(self, pos):
+    def __init__(self, pos, target=None):
         super(Queen, self).__init__(enemies, sprites)
         self.rect = pygame.Rect(pos[0], pos[1], player_width, player_height)
+        self.target = target
         self.key = 'front_stay'
         self.bullets = pygame.sprite.Group()  # for some bullets like magic ball and meteor
         self.allies = pygame.sprite.Group()  # to spawn more enemies
@@ -23,7 +26,7 @@ class Queen(pygame.sprite.Sprite):
         self.health = 500
         self.damage = 100
         self.kd = 0
-        self.kd_reset = 120
+        self.kd_reset = 240
         self.attack = False
         self.speed = 2
 
@@ -33,6 +36,7 @@ class Queen(pygame.sprite.Sprite):
 
         self.kd_self_bar_show = 100
         self.status_self_bar_show = False
+        self.ways_to_attack = [0, 1, 2, 3, 4]  # 0-meteor, 1-magic_ball, 2-push, 3-spawn enemy, 4-magic_ball_chase
 
     def draw_health_bar(self):
         image = pygame.Surface((player_width, hp_bar_height), pygame.SRCALPHA)
@@ -46,7 +50,7 @@ class Queen(pygame.sprite.Sprite):
             self.kill()
             return
         if not flag_change_image % 8:
-            self.move(flag_change_image=True)
+            self.logic_move(flag_change_image=True)
         if dmg_dealer:
             self.get_hit(dmg_dealer)
         if self.status_self_bar_show:
@@ -56,7 +60,46 @@ class Queen(pygame.sprite.Sprite):
             else:
                 self.status_self_bar_show += 1
             self.show_health_bar()
+        if self.attack:
+            self.kd += 1
+            if self.kd == self.kd_reset:
+                self.kd = 0
+                self.attack = False
+        self.logic_move()
         self.image = Queen.images[self.key]
+
+    def logic_move(self, flag_change_image=False):
+        if not self.target or not group_player.has(self.target):
+            self.key = 'front_stay'
+            return
+        x, y = self.target.rect.x, self.target.rect.y
+        if not self.kd:
+            self.kd = 1
+            self.attack = True
+            way_attack = random.choice(self.ways_to_attack)
+            if not way_attack:  # meteor
+                for _ in range(15):
+                    meteor_x = x + random.randint(-player_width * 2, player_width * 2)
+                    meteor_y = y + random.randint(-player_height * 2, player_height * 2)
+                    Meteor((meteor_x, meteor_y))
+            elif way_attack == 1 and self.target:
+                x1, y1 = self.rect.x, self.rect.y
+                count_magic_ball = random.randint(10, 15)
+                dy = -count_magic_ball // 2 * magic_ball_height
+                for i in range(count_magic_ball):  # magic_ball
+                    dy += magic_ball_height
+                    MagicBall((x1, y1 + dy), target=self.target)
+            elif way_attack == 2:  # push
+                pass
+            elif way_attack == 3:  # spawn enemy
+                pass
+            elif way_attack == 4:
+                x1, y1 = self.rect.x, self.rect.y
+                count_magic_ball = random.randint(4, 8)
+                dy = -count_magic_ball // 2 * magic_ball_height
+                for i in range(count_magic_ball):  # magic_ball_chase
+                    dy += magic_ball_height
+                    MagicBall((x1, y1 + dy), target=self.target, chase_player=True)
 
     def move(self, flag_change_image=False):
         if flag_change_image:
@@ -89,12 +132,15 @@ class Queen(pygame.sprite.Sprite):
             sprites.add(self.health_bar)
         self.draw_health_bar()
 
+    def set_target(self, target):
+        self.target = target
+
 
 class Meteor(pygame.sprite.Sprite):
     images = meteor_images
 
     def __init__(self, pos):
-        super(Meteor, self).__init__()
+        super(Meteor, self).__init__(bullets, sprites)
         self.rect = pygame.Rect(pos[0], pos[1], meteor_width, meteor_height)
         self.damage_box = self.rect
         self.damage = 15
@@ -111,33 +157,58 @@ class Meteor(pygame.sprite.Sprite):
             if self.index == 3:
                 pass
             elif self.index == 4:
+                for sprite in group_player:
+                    if pygame.sprite.collide_mask(sprite, self):
+                        group_player.update(dmg_dealer=self)
                 self.kill()
-
-    def check_damage_someone(self, sprite):
-        if pygame.sprite.spritecollideany(self, sprite):
-            sprite.update(dmg_dealer=self)
 
 
 class MagicBall(pygame.sprite.Sprite):
     images = magic_ball_images
 
-    def __init__(self, pos):
-        super(MagicBall, self).__init__()
+    def __init__(self, pos, target, chase_player=False):
+        super(MagicBall, self).__init__(bullets, sprites)
         self.rect = pygame.Rect(pos[0], pos[1], magic_ball_width, magic_ball_height)
         self.damage_box = self.rect
+        self.target = target
         self.index = 0
+        self.damage = 0.5
+        self.life_time = 200
+        self.life_time_count = 0
+        self.speed = random.randint(1, 3)
         self.image = MagicBall.images[self.index]
-        self.damage = 8
-        self.speed = 1
+        self.chase_player = chase_player
+        if not self.chase_player:
+            self.distance_x, self.distance_y = self.target.rect.x - self.rect.x, self.target.rect.y - self.rect.y
+            speed_x, speed_y = round(self.distance_x * self.speed / FPS), round(self.distance_y * self.speed / FPS)
+            self.speed_x, self.speed_y = speed_x, speed_y
 
     def update(self, flag_change_image=0, **kwargs):
+        self.life_time_count += 1
         if not flag_change_image % 8:
             self.index += 1
-        if not flag_change_image % 4:
-            self.rect = self.rect.move(self.speed)
-        self.image = MagicBall.images[self.index % len(MagicBall.images)]
-
-    def check_self_destroy(self, sprite):
-        if pygame.sprite.spritecollideany(self, sprite):
-            sprite.update(dmg_dealer=self)
+        if not flag_change_image % 2:
+            if self.chase_player:
+                distance_x, distance_y = self.target.rect.x - self.rect.x, self.target.rect.y - self.rect.y
+                k = 2
+                speed_x, speed_y = round(distance_x / FPS / self.speed * k), round(distance_y / FPS / self.speed * k)
+                dx_s = -1 if speed_x < 0 else 1
+                dy_s = -1 if speed_y < 0 else 1
+                self.rect = self.rect.move(speed_x + dx_s, speed_y + dy_s)
+            else:
+                self.rect = self.rect.move(self.speed_x, self.speed_y)
+        if self.life_time_count == self.life_time:
             self.kill()
+        if pygame.sprite.spritecollideany(self, constructions):
+            self.kill()
+        if pygame.sprite.spritecollideany(self, group_player):
+            group_player.update(dmg_dealer=self)
+            self.kill()
+        self.image = MagicBall.images[self.index % len(MagicBall.images)]
+        self.transform_image()
+
+    def transform_image(self):
+        if self.target.rect.x - self.rect.x > 0:
+            self.image = pygame.transform.flip(self.image, True, False)
+
+

@@ -202,4 +202,5 @@ class Player(pygame.sprite.Sprite):
         return self.damage_box
 
     def get_hit(self, dmg_dealer):
-        pass
+        self.health -= dmg_dealer.damage
+        print(self.health)
