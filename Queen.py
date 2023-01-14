@@ -75,7 +75,7 @@ class Queen(pygame.sprite.Sprite):
             self.previous = self.health
         if self.health < 100:
             self.speed += 1
-        if self.previous and self.previous - self.health >= 10:
+        if self.previous and self.previous - self.health >= 50:
             while True:
                 x, y = random.randint(0, width - self.rect.x), random.randint(0, height - self.rect.y)
                 if pygame.sprite.spritecollideany(self, constructions):
