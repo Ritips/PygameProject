@@ -35,7 +35,7 @@ class Queen(pygame.sprite.Sprite):
 
         self.kd_self_bar_show = 100
         self.status_self_bar_show = False
-        self.ways_to_attack = [0, 1, 2, 3, 4]  # 0-meteor, 1-magic_ball, 2-push, 3-spawn enemy, 4-magic_ball_chase
+        self.ways_to_attack = [0, 1, 2, 3, 4]  # 0-meteor, 1-magic_ball, 2-meteor2, 3-spawn enemy, 4-magic_ball_chase
 
     def draw_health_bar(self):
         image = pygame.Surface((player_width, hp_bar_height), pygame.SRCALPHA)
@@ -83,18 +83,21 @@ class Queen(pygame.sprite.Sprite):
                     Meteor((meteor_x, meteor_y))
             elif way_attack == 1 and self.target:
                 x1, y1 = self.rect.x, self.rect.y
-                count_magic_ball = random.randint(10, 15)
+                count_magic_ball = random.randint(2, 4)
                 dy = -count_magic_ball // 2 * magic_ball_height
                 for i in range(count_magic_ball):  # magic_ball
                     dy += magic_ball_height
                     MagicBall((x1, y1 + dy), target=self.target)
-            elif way_attack == 2:  # push
-                pass
+            elif way_attack == 2:  # more meteors, xD
+                for _ in range(5):
+                    meteor_x = x + random.randint(-player_width * 2, player_width * 2)
+                    meteor_y = y + random.randint(-player_height * 2, player_height * 2)
+                    Meteor((meteor_x, meteor_y), kd_limit=10)
             elif way_attack == 3:  # spawn enemy
                 pass
             elif way_attack == 4:
                 x1, y1 = self.rect.x, self.rect.y
-                count_magic_ball = random.randint(4, 8)
+                count_magic_ball = random.randint(2, 4)
                 dy = -count_magic_ball // 2 * magic_ball_height
                 for i in range(count_magic_ball):  # magic_ball_chase
                     dy += magic_ball_height
@@ -138,7 +141,7 @@ class Queen(pygame.sprite.Sprite):
 class Meteor(pygame.sprite.Sprite):
     images = meteor_images
 
-    def __init__(self, pos):
+    def __init__(self, pos, kd_limit=20):
         super(Meteor, self).__init__(bullets, sprites)
         self.rect = pygame.Rect(pos[0], pos[1], meteor_width, meteor_height)
         self.damage_box = self.rect
@@ -146,10 +149,11 @@ class Meteor(pygame.sprite.Sprite):
         self.index = 0
         self.image = Meteor.images[self.index]
         self.kd = 0
+        self.kd_limit = kd_limit
 
     def update(self, flag_change_image=0, **kwargs):
         self.kd += 1
-        if not self.kd % 20:
+        if not self.kd % self.kd_limit:
             self.index += 1
             self.kd = 0
             self.image = Meteor.images[self.index]
