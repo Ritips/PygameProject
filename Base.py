@@ -36,7 +36,7 @@ def start_game():
     index, level_to_draw = class_level.get_level()
     color = draw_level(index, level_to_draw)
 
-    player = Player((100, 100))
+    player = Player((2 * tile_width, tile_height))
     slime = Slime((100, 100))
     queen = Queen()
     queen.set_target(player)

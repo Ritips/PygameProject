@@ -47,6 +47,12 @@ class Player(pygame.sprite.Sprite):
             self.get_hit(dmg_dealer)
         self.image = Player.images[self.key]
 
+    def check_collide_mask(self):
+        for sprite in constructions:
+            if pygame.sprite.collide_mask(sprite, self):
+                return True
+        return False
+
     def move(self, check=None, flag_change_image=False):
         move_side = any_move = False
         if not check:
@@ -66,6 +72,8 @@ class Player(pygame.sprite.Sprite):
                 move_side = True
                 any_move = True
                 self.rect = self.rect.move(-self.speed, 0)
+                if self.check_collide_mask():
+                    self.rect = self.rect.move(self.speed, 0)
                 if flag_change_image:
                     if not self.attack:
                         if self.key == 'side_stay_reverse':
@@ -82,6 +90,8 @@ class Player(pygame.sprite.Sprite):
                 move_side = True
                 any_move = True
                 self.rect = self.rect.move(self.speed, 0)
+                if self.check_collide_mask():
+                    self.rect = self.rect.move(-self.speed, 0)
                 if flag_change_image:
                     if not self.attack:
                         if self.key == 'side_stay':
@@ -100,6 +110,8 @@ class Player(pygame.sprite.Sprite):
             if check[pygame.K_UP] or check[pygame.K_w]:
                 any_move = True
                 self.rect = self.rect.move(0, -self.speed)
+                if self.check_collide_mask():
+                    self.rect = self.rect.move(0, self.speed)
                 if flag_change_image and not move_side:
                     if self.key == 'back_stay':
                         self.key = 'back_right_leg'
@@ -112,6 +124,8 @@ class Player(pygame.sprite.Sprite):
             if check[pygame.K_DOWN] or check[pygame.K_s]:
                 any_move = True
                 self.rect = self.rect.move(0, self.speed)
+                if self.check_collide_mask():
+                    self.rect = self.rect.move(0, -self.speed)
                 if flag_change_image and not move_side:
                     if self.key == 'front_stay':
                         self.key = 'front_right_leg'

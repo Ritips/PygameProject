@@ -33,8 +33,8 @@ class Queen(pygame.sprite.Sprite):
         self.pos = pos
 
         # queen constants
-        self.max_health = 500
-        self.health = 500
+        self.max_health = 250
+        self.health = 250
         self.previous = None
         self.damage = 100
         self.kd = 0
@@ -86,7 +86,7 @@ class Queen(pygame.sprite.Sprite):
     def logic_move(self, flag_change_image=False):
         if not self.previous and not self.moving:
             self.previous = self.health
-        if not self.moving and self.previous and self.previous - self.health >= 40:
+        if not self.moving and self.previous and self.previous - self.health >= (self.health / self.max_health) * 50:
             while True:
                 if self.cell_to_move:
                     break
