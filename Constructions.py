@@ -1,6 +1,6 @@
 from LoadLevel import constructions, horizontal_borders, vertical_borders, sprites
 from SETTINGS import tile_width, tile_height
-from walls_images import queen_wall_image
+from walls_images import queen_wall_image, queen_path_image
 import pygame
 
 
@@ -27,8 +27,10 @@ class Border(pygame.sprite.Sprite):
 
 
 class PathQueen(pygame.sprite.Sprite):
+    image = queen_path_image
+
     def __init__(self, pos):
         super(PathQueen, self).__init__(sprites)
         self.rect = pygame.Rect(pos[0] * tile_width, pos[1] * tile_height, tile_width, tile_height)
-        self.image = pygame.Surface((tile_width, tile_height), pygame.SRCALPHA)
+        self.image = PathQueen.image
 

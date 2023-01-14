@@ -30,4 +30,5 @@ level_first = 'first_level.txt'
 black = (0, 0, 0)
 red = (255, 0, 0)
 white = (255, 255, 255)
+purple = (63, 18, 75)
 btn_start_game_color = (0, 0, 200)

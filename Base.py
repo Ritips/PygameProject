@@ -14,11 +14,6 @@ pygame.init()
 screen = pygame.display.set_mode(size)
 clock = pygame.time.Clock()
 
-player = Player((100, 100))
-slime = Slime((100, 100))
-queen = Queen()
-queen.set_target(player)
-
 
 def get_rect(x, y):
     return tile_width * x, tile_height * y, tile_width - 1, tile_height - 1
@@ -30,15 +25,25 @@ def draw_level(level_draw, index):
             for j in range(len(level_draw[i])):
                 if level_draw[i][j] == 'W':
                     WallQueen((j, i))
+                else:
+                    PathQueen((j, i))
+        return purple
+    return black
 
 
 def start_game():
     class_level = LEVELS.get_level()
     index, level_to_draw = class_level.get_level()
-    draw_level(index, level_to_draw)
+    color = draw_level(index, level_to_draw)
+
+    player = Player((100, 100))
+    slime = Slime((100, 100))
+    queen = Queen()
+    queen.set_target(player)
+
     change_image_time = 0
     while True:
-        screen.fill('grey')
+        screen.fill(color)
         change_image_time += 1
         for event in pygame.event.get():
             if event.type == pygame.QUIT:

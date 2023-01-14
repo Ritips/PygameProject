@@ -8,4 +8,5 @@ def transform_image(image_to_transform):
 
 
 queen_wall_image = transform_image(load_image('Wall1.png'))
+queen_path_image = transform_image(load_image('Path1.png'))
 
