@@ -34,7 +34,7 @@ class Queen(pygame.sprite.Sprite):
 
         # queen constants
         self.max_health = 500
-        self.health = 100
+        self.health = 500
         self.previous = None
         self.damage = 100
         self.kd = 0
