@@ -34,18 +34,19 @@ class Queen(pygame.sprite.Sprite):
 
         # queen constants
         self.max_health = 500
-        self.health = 500
+        self.health = 100
         self.previous = None
         self.damage = 100
         self.kd = 0
         self.kd_reset = 240
         self.attack = False
-        self.speed = 1
+        self.speed = 2
 
         self.health_bar = pygame.sprite.Sprite()
         self.draw_health_bar()
 
         self.define_direction = False
+        self.moving = False
 
         self.kd_self_bar_show = 100
         self.status_self_bar_show = False
@@ -83,11 +84,9 @@ class Queen(pygame.sprite.Sprite):
         self.image = Queen.images[self.key]
 
     def logic_move(self, flag_change_image=False):
-        if not self.previous:
+        if not self.previous and not self.moving:
             self.previous = self.health
-        if self.health < 100:
-            self.speed += 1
-        if self.previous and self.previous - self.health >= 10:
+        if not self.moving and self.previous and self.previous - self.health >= 40:
             while True:
                 if self.cell_to_move:
                     break
@@ -103,6 +102,7 @@ class Queen(pygame.sprite.Sprite):
         if not self.cell_to_move and not self.define_direction:
             self.pos = self.rect.x, self.rect.y
             self.move()
+            self.moving = False
             return
         if not self.define_direction:
             cell = self.cell_to_move.pop(-1)
@@ -110,6 +110,7 @@ class Queen(pygame.sprite.Sprite):
             self.define_direction = x, y
         else:
             x, y = self.define_direction
+        self.moving = True
         dx, dy = x - self.rect.x, y - self.rect.y
         if not dx and not dy:
             self.define_direction = False
@@ -166,8 +167,9 @@ class Queen(pygame.sprite.Sprite):
             self.rect = self.rect.move(-self.speed, 0)
             for construction in constructions:
                 if pygame.sprite.collide_mask(self, construction):
-                    # self.rect = self.rect.move(self.speed, 0)
-                    print('collided')
+                    self.rect = self.rect.move(self.speed, 0)
+                    self.define_direction = False
+                    self.cell_to_move.clear()
             if flag_change_image:
                 if self.key == 'side_stay':
                     self.key = 'side_step'
@@ -178,8 +180,9 @@ class Queen(pygame.sprite.Sprite):
             self.rect = self.rect.move(self.speed, 0)
             for construction in constructions:
                 if pygame.sprite.collide_mask(self, construction):
-                    #  self.rect = self.rect.move(-self.speed, 0)
-                    print('collided')
+                    self.rect = self.rect.move(-self.speed, 0)
+                    self.define_direction = False
+                    self.cell_to_move.clear()
             if flag_change_image:
                 if self.key == 'side_stay_reverse':
                     self.key = 'side_step_reverse'
@@ -189,8 +192,9 @@ class Queen(pygame.sprite.Sprite):
             self.rect = self.rect.move(0, -self.speed)
             for construction in constructions:
                 if pygame.sprite.collide_mask(self, construction):
-                    #  self.rect = self.rect.move(0, self.speed)
-                    print('collided')
+                    self.rect = self.rect.move(0, self.speed)
+                    self.define_direction = False
+                    self.cell_to_move.clear()
             if flag_change_image and not move_side:
                 if self.key == 'back_stay':
                     self.key = 'back_step'
@@ -200,8 +204,9 @@ class Queen(pygame.sprite.Sprite):
             self.rect = self.rect.move(0, self.speed)
             for construction in constructions:
                 if pygame.sprite.collide_mask(self, construction):
-                    #  self.rect = self.rect.move(0, -self.speed)
-                    print('collided')
+                    self.rect = self.rect.move(0, -self.speed)
+                    self.define_direction = False
+                    self.cell_to_move.clear()
             if flag_change_image and not move_side:
                 if self.key == 'front_stay':
                     self.key = 'front_step'
