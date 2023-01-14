@@ -166,7 +166,8 @@ class Queen(pygame.sprite.Sprite):
             self.rect = self.rect.move(-self.speed, 0)
             for construction in constructions:
                 if pygame.sprite.collide_mask(self, construction):
-                    self.rect = self.rect.move(self.speed, 0)
+                    # self.rect = self.rect.move(self.speed, 0)
+                    print('collided')
             if flag_change_image:
                 if self.key == 'side_stay':
                     self.key = 'side_step'
@@ -177,7 +178,8 @@ class Queen(pygame.sprite.Sprite):
             self.rect = self.rect.move(self.speed, 0)
             for construction in constructions:
                 if pygame.sprite.collide_mask(self, construction):
-                    self.rect = self.rect.move(-self.speed, 0)
+                    #  self.rect = self.rect.move(-self.speed, 0)
+                    print('collided')
             if flag_change_image:
                 if self.key == 'side_stay_reverse':
                     self.key = 'side_step_reverse'
@@ -187,7 +189,8 @@ class Queen(pygame.sprite.Sprite):
             self.rect = self.rect.move(0, -self.speed)
             for construction in constructions:
                 if pygame.sprite.collide_mask(self, construction):
-                    self.rect = self.rect.move(0, self.speed)
+                    #  self.rect = self.rect.move(0, self.speed)
+                    print('collided')
             if flag_change_image and not move_side:
                 if self.key == 'back_stay':
                     self.key = 'back_step'
@@ -197,7 +200,8 @@ class Queen(pygame.sprite.Sprite):
             self.rect = self.rect.move(0, self.speed)
             for construction in constructions:
                 if pygame.sprite.collide_mask(self, construction):
-                    self.rect = self.rect.move(0, -self.speed)
+                    #  self.rect = self.rect.move(0, -self.speed)
+                    print('collided')
             if flag_change_image and not move_side:
                 if self.key == 'front_stay':
                     self.key = 'front_step'

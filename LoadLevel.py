@@ -16,4 +16,5 @@ group_player = pygame.sprite.Group()
 bullets = pygame.sprite.Group()
 constructions = pygame.sprite.Group()
 level = load_level(level_first)
-
+vertical_borders = pygame.sprite.Group()
+horizontal_borders = pygame.sprite.Group()

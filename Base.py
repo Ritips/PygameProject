@@ -1,10 +1,12 @@
-from LoadLevel import *
-import pygame
-from SETTINGS import *
 from StartScreen import start_screen
 from Player import Player
 from Queen import Queen
 from Slime import Slime
+from Constructions import *
+from LoadLevel import *
+from DefinePlayerLevel import *
+from SETTINGS import *
+import pygame
 
 
 pygame.init()
@@ -22,8 +24,18 @@ def get_rect(x, y):
     return tile_width * x, tile_height * y, tile_width - 1, tile_height - 1
 
 
+def draw_level(level_draw, index):
+    if index == 1:
+        for i in range(len(level_draw)):
+            for j in range(len(level_draw[i])):
+                if level_draw[i][j] == 'W':
+                    WallQueen((j, i))
+
+
 def start_game():
-    level_to_draw = load_level(level_first)
+    class_level = LEVELS.get_level()
+    index, level_to_draw = class_level.get_level()
+    draw_level(index, level_to_draw)
     change_image_time = 0
     while True:
         screen.fill('grey')
@@ -35,10 +47,7 @@ def start_game():
                 player.func_attack(True)
         if not change_image_time % 80:
             change_image_time = 0
-        for i in range(len(level_to_draw)):
-            for j in range(len(level_to_draw[0])):
-                if level_to_draw[i][j] == 'W':
-                    pygame.draw.rect(screen, 'darkorange', get_rect(j, i))
+
         sprites.update(check=pygame.key.get_pressed(), flag_change_image=change_image_time)
         sprites.draw(screen)
         pygame.display.flip()
@@ -47,3 +56,4 @@ def start_game():
 
 start_screen()
 start_game()
+

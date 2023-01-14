@@ -1,3 +1,4 @@
+from DefinePlayerLevel import LEVELS
 import pygame
 from LoadImage import load_image
 from SETTINGS import *
@@ -69,6 +70,7 @@ class StartScreen(pygame.sprite.Sprite):
 
 
 def start_screen():
+    LEVELS.chose_level()
     StartScreen()
     btn_start = ButtonStartGame()
     btn_exit = ButtonExitGame()
