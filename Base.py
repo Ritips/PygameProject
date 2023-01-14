@@ -27,19 +27,17 @@ def draw_level(level_draw, index):
                     WallQueen((j, i))
                 else:
                     PathQueen((j, i))
-        return purple
+        player = Player((2 * tile_width, tile_height))
+        queen = Queen()
+        queen.set_target(player)
+        return purple, player
     return black
 
 
 def start_game():
     class_level = LEVELS.get_level()
     index, level_to_draw = class_level.get_level()
-    color = draw_level(index, level_to_draw)
-
-    player = Player((2 * tile_width, tile_height))
-    slime = Slime((100, 100))
-    queen = Queen()
-    queen.set_target(player)
+    color, player = draw_level(index, level_to_draw)
 
     change_image_time = 0
     while True:
