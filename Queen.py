@@ -149,6 +149,9 @@ class Queen(pygame.sprite.Sprite):
             move_side = True
             if left:
                 self.rect = self.rect.move(-self.speed, 0)
+                for construction in constructions:
+                    if pygame.sprite.collide_mask(self, construction):
+                        self.rect = self.rect.move(self.speed, 0)
                 if flag_change_image:
                     if self.key == 'side_stay':
                         self.key = 'side_step'
@@ -156,6 +159,9 @@ class Queen(pygame.sprite.Sprite):
                         self.key = 'side_stay'
             if right:
                 self.rect = self.rect.move(self.speed, 0)
+                for construction in constructions:
+                    if pygame.sprite.collide_mask(self, construction):
+                        self.rect = self.rect.move(-self.speed, 0)
                 if flag_change_image:
                     if self.key == 'side_stay_reverse':
                         self.key = 'side_step_reverse'
@@ -164,6 +170,9 @@ class Queen(pygame.sprite.Sprite):
         if not (up and down):
             if up:
                 self.rect = self.rect.move(0, -self.speed)
+                for construction in constructions:
+                    if pygame.sprite.collide_mask(self, construction):
+                        self.rect = self.rect.move(0, self.speed)
                 if flag_change_image and not move_side:
                     if self.key == 'back_stay':
                         self.key = 'back_step'
@@ -171,6 +180,9 @@ class Queen(pygame.sprite.Sprite):
                         self.key = 'back_stay'
             if down:
                 self.rect = self.rect.move(0, self.speed)
+                for construction in constructions:
+                    if pygame.sprite.collide_mask(self, construction):
+                        self.rect = self.rect.move(0, -self.speed)
                 if flag_change_image and not move_side:
                     if self.key == 'front_stay':
                         self.key = 'front_step'
