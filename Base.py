@@ -15,10 +15,6 @@ screen = pygame.display.set_mode(size)
 clock = pygame.time.Clock()
 
 
-def get_rect(x, y):
-    return tile_width * x, tile_height * y, tile_width - 1, tile_height - 1
-
-
 def draw_level(level_draw, index):
     if index == 1:
         for i in range(len(level_draw)):

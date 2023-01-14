@@ -60,7 +60,8 @@ class StartScreen(pygame.sprite.Sprite):
     def __init__(self):
         super(StartScreen, self).__init__(start_sprites)
         try:
-            image = load_image('start_image.jpg')
+            image = load_image('StartScreen.png')
+            image = pygame.transform.scale(image, (width, height))
             self.image = image
             self.rect = self.image.get_rect()
         except ValueError:
