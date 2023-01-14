@@ -2,14 +2,14 @@ from collections import deque
 
 
 class Graph:
-    def __init__(self, sp=None):
+    def __init__(self, sp=None, start=None):
         if not sp:
             self.sp = []
         else:
             self.sp = sp.copy()
         self.grid = []
         self.graph = {}
-        self.start = self.goal = None
+        self.start = self.goal = start
         self.cols = self.rows = 0
         self.make_grid()
 
@@ -18,10 +18,11 @@ class Graph:
             line = []
             for j in range(len(self.sp[i])):
                 line.append(1) if self.sp[i][j] == 'W' else line.append(0)
-                if self.sp[i][j] == 'q':
+                if not self.start and self.sp[i][j] == 'q':
                     self.start = self.goal = (j, i)
             self.grid.append(line)
         self.cols, self.rows = len(self.grid[0]), len(self.grid)
+        self.goal = self.start
         self.make_graph()
 
     def make_graph(self):

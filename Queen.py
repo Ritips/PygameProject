@@ -4,21 +4,33 @@ from SETTINGS import *
 from queen_images import queen_images
 from magic_ball_images import magic_ball_images
 from meteor_images import meteor_images
+from FindPath import Graph
 import random
 
 
 class Queen(pygame.sprite.Sprite):
     images = queen_images
 
-    def __init__(self, pos, target=None):
+    def __init__(self, pos=None, target=None):
         super(Queen, self).__init__(enemies, sprites)
-        self.rect = pygame.Rect(pos[0], pos[1], player_width, player_height)
+        if pos:
+            self.rect = pygame.Rect(pos[0], pos[1], player_width, player_height)
+        else:
+            for i in range(len(level)):
+                for j in range(len(level[0])):
+                    if level[i][j] == 'q':
+                        pos = j * tile_width, i * tile_height
+                        break
+                if pos:
+                    break
+            self.rect = pygame.Rect(pos[0], pos[1], player_width, player_height)
         self.target = target
         self.key = 'front_stay'
         self.bullets = pygame.sprite.Group()  # for some bullets like magic ball and meteor
         self.allies = pygame.sprite.Group()  # to spawn more enemies
         image = Queen.images[self.key]
         self.image = image
+        self.pos = pos
 
         # queen constants
         self.max_health = 500
@@ -33,11 +45,12 @@ class Queen(pygame.sprite.Sprite):
         self.health_bar = pygame.sprite.Sprite()
         self.draw_health_bar()
 
-        self.define_direction = pos
+        self.define_direction = False
 
         self.kd_self_bar_show = 100
         self.status_self_bar_show = False
         self.ways_to_attack = [0, 1, 2, 3, 4]  # 0-meteor, 1-magic_ball, 2-meteor2, 3-spawn enemy, 4-magic_ball_chase
+        self.cell_to_move = []
 
     def draw_health_bar(self):
         self.health_bar.rect = pygame.Rect(self.rect.x, self.rect.y - (10 * height // 600), player_width, hp_bar_height)
@@ -66,7 +79,6 @@ class Queen(pygame.sprite.Sprite):
                 self.kd = 0
                 self.attack = False
         self.logic_attack()
-
         self.logic_move(flag_change_image=(False if flag_change_image % 8 else True))
         self.image = Queen.images[self.key]
 
@@ -75,37 +87,41 @@ class Queen(pygame.sprite.Sprite):
             self.previous = self.health
         if self.health < 100:
             self.speed += 1
-        if self.previous and self.previous - self.health >= 50:
+        if self.previous and self.previous - self.health >= 10:
             while True:
+                if self.cell_to_move:
+                    break
                 x, y = random.randint(0, width - self.rect.x), random.randint(0, height - self.rect.y)
                 if pygame.sprite.spritecollideany(self, constructions):
                     continue
                 self.previous = None
-                self.define_direction = (x, y)
-                break
-        x, y = self.define_direction
-        dx, dy = x - self.rect.x, y - self.rect.y
-        if not dx:
-            if not dy:
-                self.move()
-            elif dy > 0:
-                self.move(flag_change_image=flag_change_image, down=True)
-            else:
-                self.move(flag_change_image=flag_change_image, up=True)
-        elif dx > 0:
-            if not dy:
-                self.move(flag_change_image=flag_change_image, right=True)
-            elif dy > 0:
-                self.move(flag_change_image=flag_change_image, down=True, right=True)
-            else:
-                self.move(flag_change_image=flag_change_image, up=True, right=True)
+                graph = Graph(sp=level, start=(self.pos[0] // tile_width, self.pos[1] // tile_height))
+                graph.set_goal((x // tile_width, y // tile_height))
+                self.cell_to_move = graph.get_path()
+                if self.cell_to_move:
+                    break
+        if not self.cell_to_move and not self.define_direction:
+            self.pos = self.rect.x, self.rect.y
+            self.move()
+            return
+        if not self.define_direction:
+            cell = self.cell_to_move.pop(-1)
+            x, y = cell[0] * tile_width, cell[-1] * tile_height
+            self.define_direction = x, y
         else:
-            if not dy:
-                self.move(flag_change_image=flag_change_image, left=True)
-            elif dy > 0:
-                self.move(flag_change_image=flag_change_image, down=True, left=True)
-            else:
-                self.move(flag_change_image=flag_change_image, up=True, left=True)
+            x, y = self.define_direction
+        dx, dy = x - self.rect.x, y - self.rect.y
+        if not dx and not dy:
+            self.define_direction = False
+            return
+        if dx > 0:
+            self.move(flag_change_image=flag_change_image, right=True)
+        elif dx < 0:
+            self.move(flag_change_image=flag_change_image, left=True)
+        elif dy > 0:
+            self.move(flag_change_image=flag_change_image, down=True)
+        elif dy < 0:
+            self.move(flag_change_image=flag_change_image, up=True)
 
     def logic_attack(self):
         if not self.target or not group_player.has(self.target):
@@ -145,50 +161,51 @@ class Queen(pygame.sprite.Sprite):
 
     def move(self, flag_change_image=False, up=False, down=False, left=False, right=False):
         move_side = False
-        if not (left and right):
+        if left:
             move_side = True
-            if left:
-                self.rect = self.rect.move(-self.speed, 0)
-                for construction in constructions:
-                    if pygame.sprite.collide_mask(self, construction):
-                        self.rect = self.rect.move(self.speed, 0)
-                if flag_change_image:
-                    if self.key == 'side_stay':
-                        self.key = 'side_step'
-                    else:
-                        self.key = 'side_stay'
-            if right:
-                self.rect = self.rect.move(self.speed, 0)
-                for construction in constructions:
-                    if pygame.sprite.collide_mask(self, construction):
-                        self.rect = self.rect.move(-self.speed, 0)
-                if flag_change_image:
-                    if self.key == 'side_stay_reverse':
-                        self.key = 'side_step_reverse'
-                    else:
-                        self.key = 'side_stay_reverse'
-        if not (up and down):
-            if up:
-                self.rect = self.rect.move(0, -self.speed)
-                for construction in constructions:
-                    if pygame.sprite.collide_mask(self, construction):
-                        self.rect = self.rect.move(0, self.speed)
-                if flag_change_image and not move_side:
-                    if self.key == 'back_stay':
-                        self.key = 'back_step'
-                    else:
-                        self.key = 'back_stay'
-            if down:
-                self.rect = self.rect.move(0, self.speed)
-                for construction in constructions:
-                    if pygame.sprite.collide_mask(self, construction):
-                        self.rect = self.rect.move(0, -self.speed)
-                if flag_change_image and not move_side:
-                    if self.key == 'front_stay':
-                        self.key = 'front_step'
-                    else:
-                        self.key = 'front_stay'
-        if not any((up, down, right, left)):
+            self.rect = self.rect.move(-self.speed, 0)
+            for construction in constructions:
+                if pygame.sprite.collide_mask(self, construction):
+                    self.rect = self.rect.move(self.speed, 0)
+            if flag_change_image:
+                if self.key == 'side_stay':
+                    self.key = 'side_step'
+                else:
+                    self.key = 'side_stay'
+        if right:
+            move_side = True
+            self.rect = self.rect.move(self.speed, 0)
+            for construction in constructions:
+                if pygame.sprite.collide_mask(self, construction):
+                    self.rect = self.rect.move(-self.speed, 0)
+            if flag_change_image:
+                if self.key == 'side_stay_reverse':
+                    self.key = 'side_step_reverse'
+                else:
+                    self.key = 'side_stay_reverse'
+        if up:
+            self.rect = self.rect.move(0, -self.speed)
+            for construction in constructions:
+                if pygame.sprite.collide_mask(self, construction):
+                    self.rect = self.rect.move(0, self.speed)
+            if flag_change_image and not move_side:
+                if self.key == 'back_stay':
+                    self.key = 'back_step'
+                else:
+                    self.key = 'back_stay'
+        if down:
+            self.rect = self.rect.move(0, self.speed)
+            for construction in constructions:
+                if pygame.sprite.collide_mask(self, construction):
+                    self.rect = self.rect.move(0, -self.speed)
+            if flag_change_image and not move_side:
+                if self.key == 'front_stay':
+                    self.key = 'front_step'
+                else:
+                    self.key = 'front_stay'
+        if up or down or left or right:
+            pass
+        else:
             self.key = 'front_stay'
 
     def get_hit(self, dmg_dealer):
