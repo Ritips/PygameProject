@@ -64,10 +64,14 @@ class Queen(pygame.sprite.Sprite):
             if self.kd == self.kd_reset:
                 self.kd = 0
                 self.attack = False
+        self.logic_attack()
         self.logic_move()
         self.image = Queen.images[self.key]
 
     def logic_move(self, flag_change_image=False):
+        return
+
+    def logic_attack(self):
         if not self.target or not group_player.has(self.target):
             self.key = 'front_stay'
             return
