@@ -23,21 +23,24 @@ class Queen(pygame.sprite.Sprite):
         # queen constants
         self.max_health = 500
         self.health = 500
+        self.previous = None
         self.damage = 100
         self.kd = 0
         self.kd_reset = 240
         self.attack = False
-        self.speed = 2
+        self.speed = 1
 
         self.health_bar = pygame.sprite.Sprite()
-        self.health_bar.rect = pygame.Rect(pos[0], pos[1] - (10 * height // 600), player_width, hp_bar_height)
         self.draw_health_bar()
+
+        self.define_direction = pos
 
         self.kd_self_bar_show = 100
         self.status_self_bar_show = False
         self.ways_to_attack = [0, 1, 2, 3, 4]  # 0-meteor, 1-magic_ball, 2-meteor2, 3-spawn enemy, 4-magic_ball_chase
 
     def draw_health_bar(self):
+        self.health_bar.rect = pygame.Rect(self.rect.x, self.rect.y - (10 * height // 600), player_width, hp_bar_height)
         image = pygame.Surface((player_width, hp_bar_height), pygame.SRCALPHA)
         length_line = player_width * self.health // self.max_health
         pygame.draw.rect(image, red, (0, 0, length_line, hp_bar_height))
@@ -48,8 +51,6 @@ class Queen(pygame.sprite.Sprite):
         if not self.status_self_bar_show and not self.health:
             self.kill()
             return
-        if not flag_change_image % 8:
-            self.logic_move(flag_change_image=True)
         if dmg_dealer:
             self.get_hit(dmg_dealer)
         if self.status_self_bar_show:
@@ -65,11 +66,46 @@ class Queen(pygame.sprite.Sprite):
                 self.kd = 0
                 self.attack = False
         self.logic_attack()
-        self.logic_move()
+
+        self.logic_move(flag_change_image=(False if flag_change_image % 8 else True))
         self.image = Queen.images[self.key]
 
     def logic_move(self, flag_change_image=False):
-        return
+        if not self.previous:
+            self.previous = self.health
+        if self.health < 100:
+            self.speed += 1
+        if self.previous and self.previous - self.health >= 10:
+            while True:
+                x, y = random.randint(0, width - self.rect.x), random.randint(0, height - self.rect.y)
+                if pygame.sprite.spritecollideany(self, constructions):
+                    continue
+                self.previous = None
+                self.define_direction = (x, y)
+                break
+        x, y = self.define_direction
+        dx, dy = x - self.rect.x, y - self.rect.y
+        if not dx:
+            if not dy:
+                self.move()
+            elif dy > 0:
+                self.move(flag_change_image=flag_change_image, down=True)
+            else:
+                self.move(flag_change_image=flag_change_image, up=True)
+        elif dx > 0:
+            if not dy:
+                self.move(flag_change_image=flag_change_image, right=True)
+            elif dy > 0:
+                self.move(flag_change_image=flag_change_image, down=True, right=True)
+            else:
+                self.move(flag_change_image=flag_change_image, up=True, right=True)
+        else:
+            if not dy:
+                self.move(flag_change_image=flag_change_image, left=True)
+            elif dy > 0:
+                self.move(flag_change_image=flag_change_image, down=True, left=True)
+            else:
+                self.move(flag_change_image=flag_change_image, up=True, left=True)
 
     def logic_attack(self):
         if not self.target or not group_player.has(self.target):
@@ -107,20 +143,41 @@ class Queen(pygame.sprite.Sprite):
                     dy += magic_ball_height
                     MagicBall((x1, y1 + dy), target=self.target, chase_player=True)
 
-    def move(self, flag_change_image=False):
-        if flag_change_image:
-            if self.key == 'front_stay':
-                self.key = 'side_stay'
-            elif self.key == 'side_stay':
-                self.key = 'side_stay_reverse'
-            elif self.key == 'side_stay_reverse':
-                self.key = 'back_stay'
-            elif self.key == 'back_stay':
-                self.key = 'back_step'
-            elif self.key == 'back_step':
-                self.key = 'front_stay'
-            else:
-                self.key = 'front_stay'
+    def move(self, flag_change_image=False, up=False, down=False, left=False, right=False):
+        move_side = False
+        if not (left and right):
+            move_side = True
+            if left:
+                self.rect = self.rect.move(-self.speed, 0)
+                if flag_change_image:
+                    if self.key == 'side_stay':
+                        self.key = 'side_step'
+                    else:
+                        self.key = 'side_stay'
+            if right:
+                self.rect = self.rect.move(self.speed, 0)
+                if flag_change_image:
+                    if self.key == 'side_stay_reverse':
+                        self.key = 'side_step_reverse'
+                    else:
+                        self.key = 'side_stay_reverse'
+        if not (up and down):
+            if up:
+                self.rect = self.rect.move(0, -self.speed)
+                if flag_change_image and not move_side:
+                    if self.key == 'back_stay':
+                        self.key = 'back_step'
+                    else:
+                        self.key = 'back_stay'
+            if down:
+                self.rect = self.rect.move(0, self.speed)
+                if flag_change_image and not move_side:
+                    if self.key == 'front_stay':
+                        self.key = 'front_step'
+                    else:
+                        self.key = 'front_stay'
+        if not any((up, down, right, left)):
+            self.key = 'front_stay'
 
     def get_hit(self, dmg_dealer):
         damage_box = dmg_dealer.damage_box
