@@ -22,6 +22,11 @@ button_height = int(50 * height / 600)
 
 font_size = int(50 * width / 800)
 
+tile_width = int(50 * width / 800)
+tile_height = int(50 * height / 600)
+
+level_first = 'first_level.txt'
+
 black = (0, 0, 0)
 red = (255, 0, 0)
 white = (255, 255, 255)

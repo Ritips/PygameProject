@@ -1,4 +1,5 @@
 import pygame
+from SETTINGS import *
 
 
 def load_level(filename):
@@ -14,3 +15,5 @@ enemies = pygame.sprite.Group()
 group_player = pygame.sprite.Group()
 bullets = pygame.sprite.Group()
 constructions = pygame.sprite.Group()
+level = load_level(level_first)
+
