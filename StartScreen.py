@@ -129,10 +129,16 @@ class InterfaceSettings(pygame.sprite.Sprite):
         return False
 
     def btn_settings(self):
+        font = pygame.font.Font(None, font_size)
+        font_space_y = int(8 * height / 600)
         for i in range(len(self.settings)):
             space_y = self.btn_settings_space_y + button_height * i + 5 * i
             image = pygame.Surface((button_width, button_height), pygame.SRCALPHA)
             pygame.draw.rect(image, btn_start_game_color, (0, 0, button_width, button_height))
+            get_text = ' '.join(map(str, self.settings[i]))
+            text = font.render(get_text, True, white)
+            space_x = button_width // len(get_text)
+            image.blit(text, (space_x, font_space_y))
             self.image.blit(image, (self.btn_settings_space_x, space_y))
             self.btn_settings_coords.append((self.btn_settings_space_x + self.rect.x, self.rect.y + space_y))
 
@@ -176,8 +182,8 @@ def start_screen():
                     if interface_settings:
                         change_settings = interface_settings.change_settings(event.pos)
                         if change_settings:
-                            rebase_size(change_settings)
-                            print(change_settings)
+                            with open(settings_file_name, 'w') as f_write:
+                                f_write.writelines('\n'.join(map(str, change_settings)))
 
         start_sprites.draw(screen)
         pygame.display.flip()

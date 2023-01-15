@@ -1,4 +1,6 @@
-size = width, height = 1280, 720
+settings_file_name = 'data/SETTINGS.txt'
+with open(settings_file_name) as f:
+    size = width, height = list(map(int, f.readlines()))
 
 FPS = 60
 
