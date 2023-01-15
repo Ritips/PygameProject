@@ -1,7 +1,7 @@
 from DefinePlayerLevel import LEVELS
 import pygame
 from LoadImage import load_image
-from SettingsRebase import *
+from SETTINGS import *
 
 
 pygame.font.init()

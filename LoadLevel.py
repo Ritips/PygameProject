@@ -1,5 +1,5 @@
 import pygame
-from SettingsRebase import *
+from SETTINGS import *
 
 
 def load_level(filename):

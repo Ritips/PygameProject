@@ -1,6 +1,6 @@
 from LoadImage import load_image
 import pygame
-from SettingsRebase import width, height
+from SETTINGS import width, height
 
 
 def transform_player_image(image):

@@ -1,29 +1,29 @@
-normal_size = normal_width, normal_height = 1280, 720
+size = width, height = 1280, 720
 
 FPS = 60
 
-normal_player_speed = 2
-normal_player_width = 50
-normal_player_height = 50
+player_speed = int(2 * height / 600)
+player_width = int(50 * width // 800)
+player_height = int(50 * height // 600)
 
-normal_slime_speed = 1
-normal_slime_width = 15
-normal_slime_height = 15
+slime_speed = int(1 * height / 600)
+slime_width = int(15 * width // 800)
+slime_height = int(15 * height // 600)
 
-normal_meteor_width = 34
-normal_meteor_height = 34
-normal_magic_ball_width = 20
-normal_magic_ball_height = 11
+meteor_width = int(34 * width / 800)
+meteor_height = int(34 * height / 600)
+magic_ball_width = int(20 * width / 800)
+magic_ball_height = int(11 * height / 600)
 
-normal_hp_bar_height = 5
+hp_bar_height = 5 * height // 600
 
-normal_button_width = 200
-normal_button_height = 50
+button_width = int(200 * width / 800)
+button_height = int(50 * height / 600)
 
-normal_font_size = 50
+font_size = int(50 * width / 800)
 
-normal_tile_width = 50
-normal_tile_height = 50
+tile_width = int(50 * width / 800)
+tile_height = int(50 * height / 600)
 
 level_first = 'first_level.txt'
 

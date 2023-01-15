@@ -1,5 +1,5 @@
 from LoadImage import load_image
-from SettingsRebase import width, height
+from SETTINGS import width, height
 import pygame
 
 

@@ -1,5 +1,5 @@
 from LoadImage import load_image
-from SettingsRebase import tile_width, tile_height
+from SETTINGS import tile_width, tile_height
 import pygame
 
 

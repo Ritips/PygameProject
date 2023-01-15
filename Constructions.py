@@ -1,5 +1,5 @@
 from LoadLevel import constructions, horizontal_borders, vertical_borders, sprites
-from SettingsRebase import tile_width, tile_height
+from SETTINGS import tile_width, tile_height
 from walls_images import queen_wall_image, queen_path_image
 import pygame
 
