@@ -120,9 +120,12 @@ class InterfaceSettings(pygame.sprite.Sprite):
             image = load_image('InterfaceSettingsButtonExit.png')
             image = pygame.transform.scale(image, (self.exit_width, self.exit_height))
         except ValueError:
+            line_width = 2 * width // 800
             image = pygame.Surface((self.exit_width, self.exit_height), pygame.SRCALPHA)
             pygame.draw.rect(image, red, (0, 0, self.exit_width, self.exit_height))
             pygame.draw.rect(image, light_grey, (0, 0, self.exit_width, self.exit_height), 2)
+            pygame.draw.line(image, light_grey, (0, 0), (self.exit_width, self.exit_height), line_width)
+            pygame.draw.line(image, light_grey, (0, self.exit_height), (self.exit_width, 0), line_width)
         self.image.blit(image, (self.exit_space_x, self.exit_space_y))
 
     def close(self, pos):
@@ -188,6 +191,11 @@ class Message(pygame.sprite.Sprite):
     def exit_btn(self):
         image = pygame.Surface((self.exit_width, self.exit_height), pygame.SRCALPHA)
         pygame.draw.rect(image, red, (0, 0, self.exit_width, self.exit_height))
+        pygame.draw.rect(image, white, (0, 0, self.exit_width, self.exit_height), 2)
+
+        line_width = 2 * width // 800
+        pygame.draw.line(image, white, (0, 0), (self.exit_width, self.exit_height), line_width)
+        pygame.draw.line(image, white, (0, self.exit_height), (self.exit_width, 0), line_width)
         text = self.font.render(self.text, True, white)
         text2 = self.font.render(self.text2, True, white)
         self.image.blit(text, (5, 8))
