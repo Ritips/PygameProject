@@ -108,6 +108,7 @@ class InterfaceSettings(pygame.sprite.Sprite):
             self.image = pygame.Surface((settings_width, settings_height), pygame.SRCALPHA)
             pygame.draw.rect(self.image, black, (0, 0, settings_width, settings_height))
         self.rect = pygame.Rect((space_x, space_y, settings_width, settings_height))
+        self.message = None
         self.btn_exit()
         self.btn_settings()
 
@@ -125,6 +126,8 @@ class InterfaceSettings(pygame.sprite.Sprite):
         if pos[0] in range(range_x, range_x + self.exit_width + 1):
             range_y = self.rect.y + self.exit_space_y
             if pos[1] in range(range_y, range_y + self.exit_height + 1):
+                if self.message:
+                    self.message.kill()
                 return True
         return False
 
@@ -143,11 +146,55 @@ class InterfaceSettings(pygame.sprite.Sprite):
             self.btn_settings_coords.append((self.btn_settings_space_x + self.rect.x, self.rect.y + space_y))
 
     def change_settings(self, pos):
+        if self.message:
+            return
         for i in range(len(self.btn_settings_coords)):
             start_coord = self.btn_settings_coords[i]
             if pos[0] in range(start_coord[0], start_coord[0] + button_width):
                 if pos[1] in range(start_coord[1], start_coord[1] + button_height):
+                    self.message = Message()
                     return self.settings[i]
+        return False
+
+    def btn_close_message(self, pos):
+        if self.message and self.message.close(pos):
+            self.message.kill()
+            self.message = None
+
+
+class Message(pygame.sprite.Sprite):
+    def __init__(self):
+        super(Message, self).__init__(start_sprites)
+        space_x = 200 * width // 800
+        space_y = 400 * height // 600
+        self.message_width = 400 * width // 800
+        self.message_height = button_height * 2
+        self.rect = pygame.Rect((space_x, space_y, self.message_height, self.message_width))
+        self.exit_width = 20 * width // 800
+        self.exit_height = 20 * height // 600
+        self.exit_space_x, self.exit_space_y = self.message_width - self.exit_width, 0
+        self.image = pygame.Surface((self.message_width, self.message_height), pygame.SRCALPHA)
+        pygame.draw.rect(self.image, white, (0, 0, self.message_width, self.message_height), 3)
+        self.font = pygame.font.Font(None, int(40 * width / 800))
+        self.text = '   Restart the game for the'
+        self.text2 = '    changes to take effect'
+        self.exit_btn()
+
+    def exit_btn(self):
+        image = pygame.Surface((self.exit_width, self.exit_height), pygame.SRCALPHA)
+        pygame.draw.rect(image, red, (0, 0, self.exit_width, self.exit_height))
+        text = self.font.render(self.text, True, white)
+        text2 = self.font.render(self.text2, True, white)
+        self.image.blit(text, (5, 8))
+        self.image.blit(text2, (5, int(40 * width / 800) + 8))
+        self.image.blit(image, (self.exit_space_x, self.exit_space_y))
+
+    def close(self, pos):
+        range_x = self.rect.x + self.exit_space_x
+        if pos[0] in range(range_x, range_x + self.exit_width + 1):
+            range_y = self.rect.y + self.exit_space_y
+            if pos[1] in range(range_y, range_y + self.exit_height + 1):
+                return True
         return False
 
 
@@ -184,6 +231,7 @@ def start_screen():
                         if change_settings:
                             with open(settings_file_name, 'w') as f_write:
                                 f_write.writelines('\n'.join(map(str, change_settings)))
+                        interface_settings.btn_close_message(event.pos)
 
         start_sprites.draw(screen)
         pygame.display.flip()
