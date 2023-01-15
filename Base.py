@@ -15,7 +15,10 @@ screen = pygame.display.set_mode(size)
 clock = pygame.time.Clock()
 
 
-def draw_level(level_draw, index):
+def draw_level(level_draw=None, index=0):
+    if not index or not level_draw:
+        player = Player((tile_width, tile_height))
+        return black, player
     if index == 1:
         for i in range(len(level_draw)):
             for j in range(len(level_draw[i])):
@@ -32,9 +35,8 @@ def draw_level(level_draw, index):
 
 def start_game():
     class_level = LEVELS.get_level()
-    index, level_to_draw = class_level.get_level()
-    color, player = draw_level(index, level_to_draw)
-
+    level_to_draw, index = class_level.get_level()
+    color, player = draw_level(index=index, level_draw=level_to_draw)
     change_image_time = 0
     while True:
         screen.fill(color)
