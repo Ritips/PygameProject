@@ -22,7 +22,8 @@ class Button(pygame.sprite.Sprite):
                 self.image = btn_image
             except ValueError:
                 self.image = pygame.Surface((button_width, button_height), pygame.SRCALPHA, 32)
-                pygame.draw.rect(self.image, btn_start_game_color, (0, 0, button_width, button_height))
+                pygame.draw.rect(self.image, dark_grey, (0, 0, button_width, button_height))
+                pygame.draw.rect(self.image, light_grey, (0, 0, button_width, button_height), 3)
         self.font = pygame.font.Font(None, font_size)
         self.space_y = int(8 * height / 600)
 
@@ -107,6 +108,8 @@ class InterfaceSettings(pygame.sprite.Sprite):
         except ValueError:
             self.image = pygame.Surface((settings_width, settings_height), pygame.SRCALPHA)
             pygame.draw.rect(self.image, black, (0, 0, settings_width, settings_height))
+            pygame.draw.rect(self.image, dark_grey, (0, 0, settings_width, self.exit_height))
+            pygame.draw.rect(self.image, dark_grey, (0, 0, settings_width, settings_height), 1)
         self.rect = pygame.Rect((space_x, space_y, settings_width, settings_height))
         self.message = None
         self.btn_exit()
@@ -119,6 +122,7 @@ class InterfaceSettings(pygame.sprite.Sprite):
         except ValueError:
             image = pygame.Surface((self.exit_width, self.exit_height), pygame.SRCALPHA)
             pygame.draw.rect(image, red, (0, 0, self.exit_width, self.exit_height))
+            pygame.draw.rect(image, light_grey, (0, 0, self.exit_width, self.exit_height), 2)
         self.image.blit(image, (self.exit_space_x, self.exit_space_y))
 
     def close(self, pos):
@@ -137,7 +141,8 @@ class InterfaceSettings(pygame.sprite.Sprite):
         for i in range(len(self.settings)):
             space_y = self.btn_settings_space_y + button_height * i + 5 * i
             image = pygame.Surface((button_width, button_height), pygame.SRCALPHA)
-            pygame.draw.rect(image, btn_start_game_color, (0, 0, button_width, button_height))
+            pygame.draw.rect(image, dark_grey, (0, 0, button_width, button_height))
+            pygame.draw.rect(image, light_grey, (0, 0, button_width, button_height), 3)
             get_text = ' '.join(map(str, self.settings[i]))
             text = font.render(get_text, True, white)
             space_x = button_width // len(get_text)
