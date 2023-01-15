@@ -1,7 +1,7 @@
 import random
 import pygame
 import time
-from SETTINGS import *
+from SettingsRebase import *
 from slime_images import slime_images
 
 

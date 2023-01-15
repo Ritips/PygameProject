@@ -1,6 +1,6 @@
 from LoadLevel import *
 import pygame
-from SETTINGS import *
+from SettingsRebase import *
 from player_images import player_images
 
 

@@ -1,6 +1,6 @@
 from LoadImage import load_image
 import pygame
-from SETTINGS import meteor_width, meteor_height
+from SettingsRebase import meteor_width, meteor_height
 
 
 def transform_image(image_to_transform):

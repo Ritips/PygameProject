@@ -1,6 +1,6 @@
 from LoadLevel import *
 import pygame
-from SETTINGS import *
+from SettingsRebase import *
 from queen_images import queen_images
 from magic_ball_images import magic_ball_images
 from meteor_images import meteor_images

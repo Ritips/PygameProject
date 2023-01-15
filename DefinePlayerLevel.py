@@ -1,4 +1,4 @@
-from SETTINGS import level_first
+from SettingsRebase import level_first
 from LoadLevel import load_level
 
 

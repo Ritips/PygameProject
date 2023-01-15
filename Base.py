@@ -5,7 +5,7 @@ from Slime import Slime
 from Constructions import *
 from LoadLevel import *
 from DefinePlayerLevel import *
-from SETTINGS import *
+from SettingsRebase import *
 import pygame
 
 

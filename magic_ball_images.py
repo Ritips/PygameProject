@@ -1,5 +1,5 @@
 from LoadImage import load_image
-from SETTINGS import magic_ball_height, magic_ball_width
+from SettingsRebase import magic_ball_height, magic_ball_width
 import pygame
 
 
