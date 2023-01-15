@@ -14,11 +14,12 @@ pygame.init()
 
 screen = pygame.display.set_mode(size)
 clock = pygame.time.Clock()
+esc_menu_group = pygame.sprite.Group()
 
 
 class EscMenu(pygame.sprite.Sprite):
     def __init__(self):
-        super(EscMenu, self).__init__(sprites)
+        super(EscMenu, self).__init__(esc_menu_group)
         settings_width = 400 * width // 800
         settings_height = 400 * height // 600
         space_x = 200 * width // 800
@@ -96,6 +97,10 @@ def start_game():
                     exit()
                 if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and esc_menu.close(event.pos):
                     exit()
+                if event.type == pygame.KEYDOWN and event.key == 27:
+                    esc_menu.kill()
+                    esc_menu = None
+            esc_menu_group.draw(screen)
             continue
         change_image_time += 1
         for event in pygame.event.get():
@@ -105,11 +110,11 @@ def start_game():
                 player.func_attack(True)
             if event.type == pygame.KEYDOWN and event.key == 27:
                 esc_menu = EscMenu()
+                sprites.add(esc_menu)
         if not change_image_time % 80:
             change_image_time = 0
-
-        sprites.update(check=pygame.key.get_pressed(), flag_change_image=change_image_time)
         sprites.draw(screen)
+        sprites.update(check=pygame.key.get_pressed(), flag_change_image=change_image_time)
         pygame.display.flip()
         clock.tick(FPS)
 
