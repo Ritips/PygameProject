@@ -23,7 +23,7 @@ def draw_level(level_draw, index):
                     WallQueen((j, i))
                 else:
                     PathQueen((j, i))
-        player = Player((2 * tile_width, tile_height))
+        player = Player((7 * tile_width, tile_height))
         queen = Queen()
         queen.set_target(player)
         return purple, player
