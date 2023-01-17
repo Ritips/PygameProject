@@ -13,7 +13,7 @@ class Slime(pygame.sprite.Sprite):
         self.rect = pygame.Rect(pos[0], pos[1], slime_width, slime_height)
         self.key = 'move1'
 
-        # slime constants
+        # ghost constants
         self.damage = 10
         self.health = 8
         self.attack = False
