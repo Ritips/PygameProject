@@ -6,6 +6,7 @@ from Constructions import *
 from LoadLevel import *
 from DefinePlayerLevel import *
 from SETTINGS import *
+from WinScreen import win_screen
 import pygame
 
 
@@ -114,6 +115,8 @@ def start_game():
         screen.fill(color)
         if player not in sprites:
             return 2
+        if not enemies.sprites():
+            return 3
         if esc_menu:
             pygame.mouse.set_visible(True)
             sprites.draw(screen)
@@ -162,6 +165,12 @@ def restart():
         main(restart_func=True)
 
 
+def show_win_menu():
+    result = win_screen(more_sprites=sprites)
+    if result == 123:
+        main()
+
+
 def main(restart_func=False):
     for sprite in sprites:
         sprite.kill()
@@ -172,6 +181,8 @@ def main(restart_func=False):
         main()
     elif flag == 2:
         restart()
+    elif flag == 3:
+        show_win_menu()
 
 
 if __name__ == '__main__':
