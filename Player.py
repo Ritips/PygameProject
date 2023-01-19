@@ -47,10 +47,18 @@ class Player(pygame.sprite.Sprite):
             self.get_hit(dmg_dealer)
         self.image = Player.images[self.key]
 
-    def check_collide_mask(self):
+    def check_collide_mask(self, right=False, up=False, down=False, left=False):
         for sprite in constructions:
             if pygame.sprite.collide_mask(sprite, self):
-                return True
+                x, y, x2, y2 = sprite.rect.x, sprite.rect.y, self.rect.x, self.rect.y
+                if left and x < x2:
+                    return True
+                if right and x > x2:
+                    return True
+                if down and y > y2:
+                    return True
+                if up and y < y2:
+                    return True
         return False
 
     def move(self, check=None, flag_change_image=False):
@@ -72,7 +80,7 @@ class Player(pygame.sprite.Sprite):
                 move_side = True
                 any_move = True
                 self.rect = self.rect.move(-self.speed, 0)
-                if self.check_collide_mask():
+                if self.check_collide_mask(left=True):
                     self.rect = self.rect.move(self.speed, 0)
                 if flag_change_image:
                     if not self.attack:
@@ -90,7 +98,7 @@ class Player(pygame.sprite.Sprite):
                 move_side = True
                 any_move = True
                 self.rect = self.rect.move(self.speed, 0)
-                if self.check_collide_mask():
+                if self.check_collide_mask(right=True):
                     self.rect = self.rect.move(-self.speed, 0)
                 if flag_change_image:
                     if not self.attack:
@@ -110,7 +118,7 @@ class Player(pygame.sprite.Sprite):
             if check[pygame.K_UP] or check[pygame.K_w]:
                 any_move = True
                 self.rect = self.rect.move(0, -self.speed)
-                if self.check_collide_mask():
+                if self.check_collide_mask(up=True):
                     self.rect = self.rect.move(0, self.speed)
                 if flag_change_image and not move_side:
                     if self.key == 'back_stay':
@@ -124,7 +132,7 @@ class Player(pygame.sprite.Sprite):
             if check[pygame.K_DOWN] or check[pygame.K_s]:
                 any_move = True
                 self.rect = self.rect.move(0, self.speed)
-                if self.check_collide_mask():
+                if self.check_collide_mask(down=True):
                     self.rect = self.rect.move(0, -self.speed)
                 if flag_change_image and not move_side:
                     if self.key == 'front_stay':
