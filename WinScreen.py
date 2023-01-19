@@ -56,5 +56,7 @@ def win_screen(more_sprites=None):
                 exit()
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if background.is_clicked(event.pos) == 123:
+                    for sprite in win_group_sprites:
+                        sprite.kill()
                     return 123
         pygame.display.flip()

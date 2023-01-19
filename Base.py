@@ -104,6 +104,14 @@ def draw_level(level_draw=None, index=0):
     return black
 
 
+def pass_level(index):
+    with open('data/levels.txt', 'r') as file_levels:
+        contain = list(map(str.strip, file_levels.readlines())) + [index, ]
+        with open('data/levels.txt', 'w', newline='\n') as file_levels_write:
+            for el in contain:
+                print(el, file=file_levels_write)
+
+
 def start_game():
     class_level = LEVELS.get_level()
     level_to_draw, index = class_level.get_level()
@@ -116,6 +124,7 @@ def start_game():
         if player not in sprites:
             return 2
         if not enemies.sprites():
+            pass_level(index)
             return 3
         if esc_menu:
             pygame.mouse.set_visible(True)
