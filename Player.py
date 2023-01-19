@@ -18,8 +18,11 @@ class Player(pygame.sprite.Sprite):
         self.kd = 0
         self.kd_reset = 40
         self.health = 60
+        self.max_health = 60
         self.attack = False
 
+        self.hp_bar = pygame.sprite.Sprite()
+        self.draw_health_bar()
         self.damage_box = pygame.sprite.Sprite()
         w, h = (65 * width // 800), (65 * height // 600)
         box_image = pygame.Surface((w, h), pygame.SRCALPHA)
@@ -30,7 +33,20 @@ class Player(pygame.sprite.Sprite):
         self.image = image
         self.speed = player_speed
 
+    def draw_health_bar(self):
+        self.hp_bar.add(sprites)
+        x, y = 5 * width // 800, 5 * height // 600
+        w, h = 50 * width // 800, 20 * height // 600
+        self.hp_bar.rect = pygame.Rect(x, y, w, h)
+        image = pygame.Surface((w, h), pygame.SRCALPHA)
+        length_line = w * self.health // self.max_health
+        pygame.draw.rect(image, red, (0, 0, length_line, h))
+        pygame.draw.rect(image, black, (0, 0, w, h), 3)
+        self.hp_bar.image = image
+
     def update(self, check=None, flag_change_image=0, dmg_dealer=None, **kwargs):
+        if not self.health:
+            self.kill()
         if check:
             if not flag_change_image % 8:
                 self.move(check=check, flag_change_image=True)
@@ -225,4 +241,6 @@ class Player(pygame.sprite.Sprite):
 
     def get_hit(self, dmg_dealer):
         self.health -= dmg_dealer.damage
-        print(self.health)
+        if self.health < 0:
+            self.health = 0
+        self.draw_health_bar()

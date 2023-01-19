@@ -219,6 +219,7 @@ def start_screen():
     btn_settings = ButtonSettings()
     btn_chose_level = ButtonChoseLevel()
     interface_settings = None
+    pygame.mouse.set_visible(True)
     while True:
         screen.fill(black)
         for event in pygame.event.get():

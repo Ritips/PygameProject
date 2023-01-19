@@ -111,6 +111,8 @@ def start_game():
     running = True
     while running:
         screen.fill(color)
+        if player not in sprites:
+            return True  # here will be another function
         if esc_menu:
             pygame.mouse.set_visible(True)
             sprites.draw(screen)
