@@ -1,4 +1,5 @@
 from StartScreen import start_screen
+from DeathHero import end_screen
 from Player import Player
 from Queen import Queen
 from Constructions import *
@@ -112,7 +113,7 @@ def start_game():
     while running:
         screen.fill(color)
         if player not in sprites:
-            return True  # here will be another function
+            return 2  # here will be another function
         if esc_menu:
             pygame.mouse.set_visible(True)
             sprites.draw(screen)
@@ -129,7 +130,7 @@ def start_game():
                         sprites.empty()
                         enemies.empty()
                         group_player.empty()
-                        return True
+                        return 1
                 if event.type == pygame.KEYDOWN and event.key == 27:
                     esc_menu.kill()
                     esc_menu = None
@@ -150,14 +151,27 @@ def start_game():
         sprites.update(check=pygame.key.get_pressed(), flag_change_image=change_image_time)
         pygame.display.flip()
         clock.tick(FPS)
-    return False
+    return 0
 
 
-def main():
-    start_screen()
-    flag = start_game()
-    if flag:
+def restart():
+    result = end_screen(more_sprites=sprites)
+    if result == 11:
         main()
+    elif result == 22:
+        main(restart_func=True)
+
+
+def main(restart_func=False):
+    for sprite in sprites:
+        sprite.kill()
+    if not restart_func:
+        start_screen()
+    flag = start_game()
+    if flag == 1:
+        main()
+    elif flag == 2:
+        restart()
 
 
 if __name__ == '__main__':

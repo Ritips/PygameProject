@@ -229,6 +229,8 @@ def start_screen():
                 if not interface_settings:
                     if btn_start.is_clicked(event.pos):
                         screen.fill(black)
+                        for sprite in start_sprites:
+                            sprite.kill()
                         return
                     if btn_exit.is_clicked(event.pos):
                         exit()
