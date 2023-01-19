@@ -24,7 +24,7 @@ class Player(pygame.sprite.Sprite):
         self.hp_bar = pygame.sprite.Sprite()
         self.draw_health_bar()
         self.damage_box = pygame.sprite.Sprite()
-        w, h = (65 * width // 800), (65 * height // 600)
+        w, h = player_width, player_height
         box_image = pygame.Surface((w, h), pygame.SRCALPHA)
         pygame.draw.rect(box_image, black, (0, 0, w, h))
         self.damage_box.image = box_image
@@ -214,7 +214,7 @@ class Player(pygame.sprite.Sprite):
         w, h = 50, 50
         x, y = self.rect.x, self.rect.y
 
-        dx, dy = Player.images[self.key].get_size()
+        dx = dy = 0
         if 'reverse' in self.key and 'side' in self.key:
             dx, w, h = dx * width // 800, w * width // 800, h * height // 600
             self.damage_box.rect = pygame.Rect(x - 2 * dx, y, w, h)
