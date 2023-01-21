@@ -1,7 +1,7 @@
 from StartScreen import start_screen
 from DeathHero import end_screen
 from Player import Player
-from Queen import Queen
+from Queen import Queen, Valkyrie
 from Constructions import *
 from LoadLevel import *
 from DefinePlayerLevel import *
@@ -98,6 +98,7 @@ def draw_level(level_draw=None, index=0):
                 else:
                     PathQueen((j, i))
         player = Player((7 * tile_width, tile_height))
+        Valkyrie(pos=(7 * tile_width, tile_height))
         queen = Queen()
         queen.set_target(player)
         return purple, player
@@ -161,8 +162,9 @@ def start_game():
             change_image_time = 0
         sprites.draw(screen)
         sprites.update(check=pygame.key.get_pressed(), flag_change_image=change_image_time)
+        pygame.display.set_caption(str(clock.get_fps()))
         pygame.display.flip()
-        clock.tick(FPS)
+        clock.tick()
     return 0
 
 

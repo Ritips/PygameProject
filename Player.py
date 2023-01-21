@@ -17,8 +17,8 @@ class Player(pygame.sprite.Sprite):
         self.damage = 5
         self.kd = 0
         self.kd_reset = 40
-        self.health = 60
-        self.max_health = 60
+        self.health = 80
+        self.max_health = 80
         self.attack = False
 
         self.hp_bar = pygame.sprite.Sprite()
@@ -64,7 +64,11 @@ class Player(pygame.sprite.Sprite):
         self.image = Player.images[self.key]
 
     def check_collide_mask(self, right=False, up=False, down=False, left=False):
-        for sprite in constructions:
+        # optimisation: reducing sprites to check for collide
+        constructions2 = filter(lambda n: (abs(n.rect.x - self.rect.x) <= n.rect.w
+                                           and abs(n.rect.y - self.rect.y) <= n.rect.h), constructions)
+        # check collide mask and returns side where collide have happened
+        for sprite in constructions2:
             if pygame.sprite.collide_mask(sprite, self):
                 x, y, x2, y2 = sprite.rect.x, sprite.rect.y, self.rect.x, self.rect.y
                 if left and x < x2:
