@@ -17,11 +17,14 @@ class Player(pygame.sprite.Sprite):
         self.damage = 5
         self.kd = 0
         self.kd_reset = 40
-        self.health = 60
+        self.health = 80
+        self.max_health = 80
         self.attack = False
 
+        self.hp_bar = pygame.sprite.Sprite()
+        self.draw_health_bar()
         self.damage_box = pygame.sprite.Sprite()
-        w, h = (65 * width // 800), (65 * height // 600)
+        w, h = player_width, player_height
         box_image = pygame.Surface((w, h), pygame.SRCALPHA)
         pygame.draw.rect(box_image, black, (0, 0, w, h))
         self.damage_box.image = box_image
@@ -30,7 +33,20 @@ class Player(pygame.sprite.Sprite):
         self.image = image
         self.speed = player_speed
 
+    def draw_health_bar(self):
+        self.hp_bar.add(sprites)
+        x, y = 5 * width // 800, 5 * height // 600
+        w, h = 50 * width // 800, 20 * height // 600
+        self.hp_bar.rect = pygame.Rect(x, y, w, h)
+        image = pygame.Surface((w, h), pygame.SRCALPHA)
+        length_line = w * self.health // self.max_health
+        pygame.draw.rect(image, red, (0, 0, length_line, h))
+        pygame.draw.rect(image, black, (0, 0, w, h), 3)
+        self.hp_bar.image = image
+
     def update(self, check=None, flag_change_image=0, dmg_dealer=None, **kwargs):
+        if not self.health:
+            self.kill()
         if check:
             if not flag_change_image % 8:
                 self.move(check=check, flag_change_image=True)
@@ -47,10 +63,22 @@ class Player(pygame.sprite.Sprite):
             self.get_hit(dmg_dealer)
         self.image = Player.images[self.key]
 
-    def check_collide_mask(self):
-        for sprite in constructions:
+    def check_collide_mask(self, right=False, up=False, down=False, left=False):
+        # optimisation: reducing sprites to check for collide
+        constructions2 = filter(lambda n: (abs(n.rect.x - self.rect.x) <= n.rect.w
+                                           and abs(n.rect.y - self.rect.y) <= n.rect.h), constructions)
+        # check collide mask and returns side where collide have happened
+        for sprite in constructions2:
             if pygame.sprite.collide_mask(sprite, self):
-                return True
+                x, y, x2, y2 = sprite.rect.x, sprite.rect.y, self.rect.x, self.rect.y
+                if left and x < x2:
+                    return True
+                if right and x > x2:
+                    return True
+                if down and y > y2:
+                    return True
+                if up and y < y2:
+                    return True
         return False
 
     def move(self, check=None, flag_change_image=False):
@@ -72,7 +100,7 @@ class Player(pygame.sprite.Sprite):
                 move_side = True
                 any_move = True
                 self.rect = self.rect.move(-self.speed, 0)
-                if self.check_collide_mask():
+                if self.check_collide_mask(left=True):
                     self.rect = self.rect.move(self.speed, 0)
                 if flag_change_image:
                     if not self.attack:
@@ -90,7 +118,7 @@ class Player(pygame.sprite.Sprite):
                 move_side = True
                 any_move = True
                 self.rect = self.rect.move(self.speed, 0)
-                if self.check_collide_mask():
+                if self.check_collide_mask(right=True):
                     self.rect = self.rect.move(-self.speed, 0)
                 if flag_change_image:
                     if not self.attack:
@@ -110,7 +138,7 @@ class Player(pygame.sprite.Sprite):
             if check[pygame.K_UP] or check[pygame.K_w]:
                 any_move = True
                 self.rect = self.rect.move(0, -self.speed)
-                if self.check_collide_mask():
+                if self.check_collide_mask(up=True):
                     self.rect = self.rect.move(0, self.speed)
                 if flag_change_image and not move_side:
                     if self.key == 'back_stay':
@@ -124,7 +152,7 @@ class Player(pygame.sprite.Sprite):
             if check[pygame.K_DOWN] or check[pygame.K_s]:
                 any_move = True
                 self.rect = self.rect.move(0, self.speed)
-                if self.check_collide_mask():
+                if self.check_collide_mask(down=True):
                     self.rect = self.rect.move(0, -self.speed)
                 if flag_change_image and not move_side:
                     if self.key == 'front_stay':
@@ -190,7 +218,7 @@ class Player(pygame.sprite.Sprite):
         w, h = 50, 50
         x, y = self.rect.x, self.rect.y
 
-        dx, dy = Player.images[self.key].get_size()
+        dx = dy = 0
         if 'reverse' in self.key and 'side' in self.key:
             dx, w, h = dx * width // 800, w * width // 800, h * height // 600
             self.damage_box.rect = pygame.Rect(x - 2 * dx, y, w, h)
@@ -217,4 +245,6 @@ class Player(pygame.sprite.Sprite):
 
     def get_hit(self, dmg_dealer):
         self.health -= dmg_dealer.damage
-        print(self.health)
+        if self.health < 0:
+            self.health = 0
+        self.draw_health_bar()
