@@ -164,7 +164,7 @@ def start_game():
         sprites.update(check=pygame.key.get_pressed(), flag_change_image=change_image_time)
         pygame.display.set_caption(str(clock.get_fps()))
         pygame.display.flip()
-        clock.tick()
+        clock.tick(FPS)
     return 0
 
 
