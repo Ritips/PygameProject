@@ -2,7 +2,7 @@ settings_file_name = 'data/SETTINGS.txt'
 with open(settings_file_name) as f:
     size = width, height = list(map(int, f.readlines()))
 
-FPS = 60
+FPS = 600
 
 player_speed = int(2 * height / 600)
 player_width = int(50 * width // 800)
@@ -28,6 +28,8 @@ tile_width = int(50 * width / 800)
 tile_height = int(50 * height / 600)
 
 level_first = 'first_level.txt'
+start_level = 'start_level.txt'
+finish_level = 'finish_level.txt'
 
 black = (0, 0, 0)
 red = (255, 0, 0)
