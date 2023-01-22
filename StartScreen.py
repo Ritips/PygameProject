@@ -212,7 +212,7 @@ class Message(pygame.sprite.Sprite):
 
 
 def start_screen():
-    LEVELS.chose_level(level_chosen=1)
+    LEVELS.chose_level(level_chosen=0)
     StartScreen()
     btn_start = ButtonStartGame()
     btn_exit = ButtonExitGame()
