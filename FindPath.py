@@ -43,7 +43,6 @@ class Graph:
     def bfs(self):  # realisation of Dijkstra's algorithm
         queue = deque([self.start])
         visited = {self.start: None}
-
         while queue:
             cur_node = queue.popleft()
             if cur_node == self.goal:
@@ -57,7 +56,8 @@ class Graph:
         return queue, visited
 
     def set_goal(self, goal):  # set the cell to get into
-        self.goal = goal
+        if not self.grid[goal[1]][goal[0]]:
+            self.goal = goal
 
     def get_path(self):  # return sp of cells that must be passed through to reach the destination
         queue, visited = self.bfs()
@@ -68,3 +68,6 @@ class Graph:
                 path_root.append(path_segment)
             path_segment = visited[path_segment]
         return path_root
+
+    def get_graph(self):
+        return self.graph

@@ -4,7 +4,6 @@ from SETTINGS import *
 from queen_images import queen_images
 from magic_ball_images import magic_ball_images
 from meteor_images import meteor_images
-from valkyrie_images import valkyrie_images
 from FindPath import Graph
 import random
 
@@ -34,14 +33,14 @@ class Queen(pygame.sprite.Sprite):
         self.pos = pos
 
         # queen constants
-        self.max_health = 250
-        self.health = 250
+        self.max_health = 350
+        self.health = 350
         self.previous = None
         self.damage = 100
         self.kd = 0
         self.kd_reset = 240
         self.attack = False
-        self.speed = 2
+        self.speed = 4
 
         self.health_bar = pygame.sprite.Sprite()
         self.draw_health_bar()
@@ -293,84 +292,3 @@ class MagicBall(pygame.sprite.Sprite):
     def transform_image(self):
         if self.target.rect.x - self.rect.x > 0:
             self.image = pygame.transform.flip(self.image, True, False)
-
-
-class Valkyrie(pygame.sprite.Sprite):
-    images = valkyrie_images
-
-    def __init__(self, pos=None, target=None):
-        super(Valkyrie, self).__init__(enemies, sprites)
-        self.rect = pygame.Rect(pos[0], pos[1], player_width, player_height)
-        self.target = target
-        self.key = 'front1'
-        self.image = Valkyrie.images[self.key]
-        self.damage = 10
-        self.max_health = 100
-        self.health = 100
-        self.kd = 0
-        self.kd_reset = 120
-        self.attack = False
-        self.speed = 2
-
-        self.health_bar = pygame.sprite.Sprite()
-        self.draw_health_bar()
-
-        self.damage_box = pygame.sprite.Sprite(sprites)
-        box_image = pygame.Surface((player_width, player_height), pygame.SRCALPHA)
-        pygame.draw.rect(box_image, black, (0, 0, player_width, player_height))
-        self.damage_box.image = box_image
-        self.damage_box.rect = pygame.Rect(self.rect.x, self.rect.y, self.rect.w, self.rect.h)
-
-        self.define_direction = False
-        self.moving = False
-
-        self.kd_self_bar_show = 100
-        self.status_self_bar_show = False
-        self.cell_to_move = []
-
-    def draw_health_bar(self):
-        self.health_bar.rect = pygame.Rect(self.rect.x, self.rect.y - (10 * height // 600), player_width, hp_bar_height)
-        image = pygame.Surface((player_width, hp_bar_height), pygame.SRCALPHA)
-        length_line = player_width * self.health // self.max_health
-        pygame.draw.rect(image, red, (0, 0, length_line, hp_bar_height))
-        pygame.draw.rect(image, black, (0, 0, player_width, hp_bar_height), 1)
-        self.health_bar.image = image
-
-    def update(self, flag_change_image=0, dmg_dealer=None, **kwargs):
-        if not self.status_self_bar_show and not self.health:
-            self.kill()
-            return
-        if dmg_dealer:
-            pass
-        if self.status_self_bar_show:
-            if self.status_self_bar_show == self.kd_self_bar_show:
-                self.status_self_bar_show = False
-                self.health_bar.remove(sprites)
-            else:
-                self.status_self_bar_show += 1
-            self.show_health_bar()
-        if self.attack:
-            self.kd += 1
-            if self.kd == self.kd_reset:
-                self.kd = 0
-                self.attack = False
-        self.logic_attack()
-        self.logic_move(flag_change_image=(False if flag_change_image % 8 else True))
-        self.image = Valkyrie.images[self.key]
-
-    def show_health_bar(self):
-        if not sprites.has(self.health_bar) and self.status_self_bar_show:
-            sprites.add(self.health_bar)
-        self.draw_health_bar()
-
-    def logic_attack(self):
-        pass
-
-    def logic_move(self, flag_change_image=False):
-        pass
-
-    def move(self):
-        pass
-
-    def set_target(self, target):
-        self.target = target
