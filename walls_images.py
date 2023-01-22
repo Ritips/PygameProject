@@ -9,4 +9,5 @@ def transform_image(image_to_transform):
 
 queen_wall_image = transform_image(load_image('Wall1.png'))
 queen_path_image = transform_image(load_image('Path1.png'))
-
+start_wall_image = transform_image(load_image('WallCastle.png'))
+start_path_image = transform_image(load_image('PathCastle.png'))

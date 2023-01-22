@@ -5,7 +5,7 @@ from SETTINGS import width, height
 
 def transform_image(image):
     x, y = image.get_size()
-    x, y = int(width * (x + 1) / 800), int(height * (y + 1) / 600)
+    x, y = int(width * (x + 2) / 800), int(height * (y + 2) / 600)
     return pygame.transform.scale(image, (x, y))
 
 
