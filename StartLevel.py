@@ -42,16 +42,16 @@ class Text(pygame.sprite.Sprite):
             return False
 
     def draw_text(self):
-        space_height = 'i * 15 + 1' if len(self.content) == 3 else 'i * 15 + 16'
+        space_height = 'tile_height - (i + 1) * (self.font_size - 4 * height // 600)'
         for i in range(len(self.content)):
-            text = self.font.render(self.content[i], True, white)
-            self.image.blit(text, (0, eval(space_height)))
+            text = self.font.render(self.content[-(i + 1)], True, white)
+            self.image.blit(text, (2, eval(space_height)))
 
 
 class TextControlHero(Text):
     def __init__(self, pos):
         super(TextControlHero, self).__init__(pos)
-        self.content = ['To control', ' hero use', ' WASD']
+        self.content = ['To control', 'hero use', 'WASD']
         self.draw_text()
 
 
@@ -68,8 +68,11 @@ class Dialog(pygame.sprite.Sprite):
         self.pos = 2 * tile_width, tile_height
         self.width, self.height = 12 * tile_width, 10 * tile_height
         self.rect = pygame.Rect(self.pos[0], self.pos[1], self.width, self.height)
-        self.image = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
-        self.image.fill((0, 0, 0))
+        self.image = pygame.Surface((self.width, self.height), pygame.SRCALPHA, 32)
+        self.image = self.image.convert_alpha()
+        r, g, b = light_grey
+        self.image.fill((r, g, b, 255))
+        pygame.draw.rect(self.image, black, (0, 0, self.width, self.height), 5 * width // 800)
 
 
 def draw_level(level_draw=None, index=0):
