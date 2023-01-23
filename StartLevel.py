@@ -141,7 +141,6 @@ def start_level_game():
                 exit()
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and not player.check_kd():
                 player.func_attack(True)
-                # sprites.update(dmg_dealer=player)  for prank
             if event.type == pygame.KEYDOWN:
                 if event.key == 27:
                     esc_menu = EscMenu()

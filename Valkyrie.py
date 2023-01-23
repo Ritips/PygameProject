@@ -1,6 +1,6 @@
 import pygame
 from SETTINGS import *
-from LoadLevel import enemies, sprites
+from LoadLevel import enemies, sprites, group_player
 from valkyrie_images import valkyrie_images
 
 
@@ -25,6 +25,8 @@ class Valkyrie(pygame.sprite.Sprite):
 
         self.kd_self_bar_show = 100
         self.status_self_bar_show = False
+
+        self.hit_amount = 0
 
     def update(self, dmg_dealer=None, **kwargs):
         if dmg_dealer:
@@ -53,6 +55,9 @@ class Valkyrie(pygame.sprite.Sprite):
     def get_hit(self, dmg_dealer):
         damage_box = dmg_dealer.damage_box
         if pygame.sprite.collide_rect(self, damage_box):
+            self.hit_amount += 1
+            if self.hit_amount >= 100:
+                group_player.update(dmg_dealer=dmg_dealer)
             self.health -= dmg_dealer.damage
             if self.health > 0:
                 self.status_self_bar_show = 1
@@ -60,3 +65,6 @@ class Valkyrie(pygame.sprite.Sprite):
                 self.health = 0
                 self.status_self_bar_show = False
                 self.kill(), self.health_bar.kill()
+
+    def get_hit_count(self):
+        return self.hit_amount
