@@ -2,10 +2,6 @@ from DefinePlayerLevel import LEVELS
 from QueenLevel import queen_level
 from StartScreen import start_screen
 from StartLevel import start_level_game
-import pygame
-
-
-pygame.init()
 
 
 def main():

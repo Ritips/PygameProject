@@ -2,7 +2,7 @@ settings_file_name = 'data/SETTINGS.txt'
 with open(settings_file_name) as f:
     size = width, height = list(map(int, f.readlines()))
 
-FPS = 600
+FPS = 60
 
 player_speed = int(2 * height / 600)
 player_width = int(50 * width // 800)
