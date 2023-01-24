@@ -17,7 +17,7 @@ class Valkyrie(pygame.sprite.Sprite):
         self.speed = 2
 
         self.rect = pygame.Rect(pos[0] * tile_width, pos[1] * tile_height, player_width, player_height)
-        self.key = 'front1'
+        self.key = 'front3'
         self.image = Valkyrie.images[self.key]
 
         self.health_bar = pygame.sprite.Sprite()
@@ -38,6 +38,8 @@ class Valkyrie(pygame.sprite.Sprite):
             else:
                 self.status_self_bar_show += 1
             self.show_health_bar()
+        if self.key == 'front3':
+            self.image = pygame.transform.scale(self.image, (tile_width, tile_height))
 
     def draw_health_bar(self):
         self.health_bar.rect = pygame.Rect(self.rect.x, self.rect.y - (10 * height // 600), player_width, hp_bar_height)
