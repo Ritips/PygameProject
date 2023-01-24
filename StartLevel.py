@@ -12,6 +12,7 @@ pygame.init()
 screen = pygame.display.set_mode(size)
 clock = pygame.time.Clock()
 text_group_sprites = pygame.sprite.Group()
+exit_level = 0
 
 
 class Text(pygame.sprite.Sprite):
@@ -55,11 +56,46 @@ class TextControlHero(Text):
         self.draw_text()
 
 
+class TextAttackEnemy(Text):
+    def __init__(self, pos):
+        super(TextAttackEnemy, self).__init__(pos)
+        self.content = ['To attack enemy', 'use LMB']
+        self.draw_text()
+
+
 class TextTalk(Text):
     def __init__(self, pos):
         super(TextTalk, self).__init__(pos)
         self.content = ['Press E', 'to talk']
         self.draw_text()
+
+
+class ExitLevel(Text):
+    def __init__(self, pos):
+        super(ExitLevel, self).__init__(pos)
+        self.content = ['Come here']
+        self.draw_text()
+        self.status = 0
+
+    def change_follow_status(self):
+        self.status = 1
+
+    def get_status(self):
+        return self.status
+
+    def near(self, pos=None):
+        global exit_level
+        if not pos:
+            return
+        if self.status:
+            x, y, w, h = self.rect
+            x2, y2 = pos
+            if abs(x2 - x) < w and abs(y - y2) <= h:
+                exit_level = 1
+                return
+            self.add(sprites)
+        else:
+            self.remove(sprites)
 
 
 class Dialog(pygame.sprite.Sprite):
@@ -73,6 +109,23 @@ class Dialog(pygame.sprite.Sprite):
         r, g, b = light_grey
         self.image.fill((r, g, b, 255))
         pygame.draw.rect(self.image, black, (0, 0, self.width, self.height), 5 * width // 800)
+        import_size = 100 * width // 800, 100 * width // 800
+        hero_image = group_player.sprites()[0].images['front_stay']
+        hero_image = pygame.transform.scale(hero_image, import_size)
+        valkyrie_image = Valkyrie.images['front3']
+        valkyrie_image = pygame.transform.scale(valkyrie_image, import_size)
+        self.image.blit(hero_image, (0, 0))
+        self.image.blit(valkyrie_image, (self.width - import_size[0], 0))
+        self.font = pygame.font.Font(None, 30 * width // 800)
+        self.render_text()
+
+    def render_text(self):
+        phrases = ['Dear hero! The world is under the threat', 'You must save it and defeat',
+                   'The deadly monster', 'By the way you will get reward', 'you will get it from monster']
+        space = 30 * width // 800 + 5 * height // 600
+        for i, text in enumerate(phrases):
+            text = self.font.render(text, True, white)
+            self.image.blit(text, (100 * width // 800 + 10 * width // 800, i * space))
 
 
 def draw_level(level_draw=None, index=0):
@@ -91,6 +144,7 @@ def draw_level(level_draw=None, index=0):
 
 
 def start_level_game():
+    global exit_level
     class_level = LEVELS.get_level()
     level_to_draw, index = class_level.get_level()
     color, player = draw_level(index=index, level_draw=level_to_draw)
@@ -98,7 +152,9 @@ def start_level_game():
     esc_menu = None
     running = True
     dialog = None
-    control_notice = TextControlHero((8, 1))
+    TextControlHero((8, 1))
+    TextAttackEnemy((8, 6))
+    notice_exit = ExitLevel((1, 0))
     start_talk_notice = TextTalk((12, 2))
     while running:
         screen.fill(color)
@@ -112,6 +168,7 @@ def start_level_game():
                     exit()
                 elif event.type == pygame.KEYDOWN and event.key == 101:
                     start_talk_notice = TextTalk((12, 2))
+                    notice_exit.change_follow_status()
                     dialog.kill()
                     dialog = None
             continue
@@ -152,6 +209,11 @@ def start_level_game():
                     dialog = Dialog()
         if not change_image_time % 80:
             change_image_time = 0
+        if exit_level:
+            exit_level = 0
+            for sprite in sprites:
+                sprite.kill()
+            return 110102
         sprites.draw(screen)
         sprites.update(check=pygame.key.get_pressed(), flag_change_image=change_image_time)
         text_group_sprites.update(check_position_player=(player.rect.x, player.rect.y))
