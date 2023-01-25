@@ -211,6 +211,94 @@ class Message(pygame.sprite.Sprite):
         return False
 
 
+class ButtonLevel(pygame.sprite.Sprite):
+    def __init__(self, pos, text):
+        super(ButtonLevel, self).__init__(start_sprites)
+        self.rect = pygame.Rect(pos[0], pos[1], tile_width, tile_height)
+        self.image = pygame.Surface((tile_width, tile_height), pygame.SRCALPHA, 32)
+        self.image = self.image.convert_alpha()
+        self.image.fill((0, 0, 0, 0))
+        pygame.draw.rect(self.image, dark_grey, (0, 0, tile_width, tile_height), 3 * width // 800)
+        self.font = pygame.font.Font(None, 30 * width // 800)
+        self.text_string = text
+        self.text = self.font.render(text, True, white)
+        self.image.blit(self.text, (0, 0))
+
+    def is_clicked(self, pos):
+        if pos[0] in range(self.rect.x, self.rect.x + self.rect.w):
+            if pos[1] in range(self.rect.y, self.rect.y + self.rect.h):
+                return True
+
+    def get_surface(self):
+        return self.image
+
+    def get_text(self):
+        return self.text_string
+
+
+class InterfaceChoseLevel(pygame.sprite.Sprite):
+    def __init__(self):
+        super(InterfaceChoseLevel, self).__init__(start_sprites)
+        self.x = 200 * width // 800
+        self.y = 100 * height // 600
+        self.width = 400 * width // 800
+        self.height = 400 * height // 600
+        self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
+        self.image = pygame.Surface((self.width, self.height), pygame.SRCALPHA, 32)
+        self.image.fill((0, 0, 0))
+        pygame.draw.rect(self.image, dark_grey, (0, 0, self.width, self.height), 3 * width // 800)
+        pygame.draw.rect(self.image, dark_grey, (0, 0, self.width, self.height // 20))
+
+        self.x2 = self.width - self.width // 10 // 2
+        self.y2 = self.y
+        self.w2 = self.width // 20
+        self.h2 = self.height // 20
+
+        pygame.draw.rect(self.image, red, (self.x2, 0, self.w2, self.h2))
+        line_width = 1 * width // 800
+        pygame.draw.rect(self.image, light_grey, (self.x2, 0, self.w2, self.h2), line_width)
+        pygame.draw.line(self.image, light_grey, (self.x2, 0), (self.width, self.h2), line_width)
+        pygame.draw.line(self.image, light_grey, (self.x2, self.h2 - 1), (self.width, 0), line_width)
+
+        self.content = []
+        self.buttons = []
+
+    def update(self, read_file=False):
+        if not read_file:
+            return
+        with open('data/levels.txt', 'r') as f_read:
+            [self.content.append(el) for el in map(str.strip, f_read.readlines()) if el not in self.content]
+            self.output_levels_buttons()
+
+    def output_levels_buttons(self):
+        box = self.width // tile_width, self.height // tile_height
+        space_y = 10 * height // 600
+        index = 0
+        for i in range(box[1]):
+            if index >= len(self.content):
+                break
+            for j in range(box[0]):
+                if index >= len(self.content):
+                    break
+                content = self.content[index]
+                pos_x, pos_y = self.rect.x + tile_width * j, self.rect.y + tile_height * i + self.h2 + space_y
+                btn = ButtonLevel((pos_x, pos_y), content)
+                self.buttons.append(btn)
+                index += 1
+
+    def get_click(self, pos):
+        btn = list(filter(lambda x: x.is_clicked(pos), self.buttons))
+        if not btn:
+            return -182
+        return int(btn[0].get_text())
+
+    def close(self, pos):
+        if pos[0] in range(self.x + self.x2, self.rect.x + self.width):
+            if pos[1] in range(self.rect.y, self.rect.y + self.y2):
+                [btn.kill() for btn in self.buttons]
+                return True
+
+
 def start_screen():
     LEVELS.chose_level(level_chosen=0)
     StartScreen()
@@ -219,23 +307,28 @@ def start_screen():
     btn_settings = ButtonSettings()
     btn_chose_level = ButtonChoseLevel()
     interface_settings = None
+    interface_level = None
+    pygame.mouse.set_visible(True)
     while True:
         screen.fill(black)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 exit()
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                if not interface_settings:
+                if not interface_settings and not interface_level:
                     if btn_start.is_clicked(event.pos):
                         screen.fill(black)
+                        for sprite in start_sprites:
+                            sprite.kill()
                         return
                     if btn_exit.is_clicked(event.pos):
                         exit()
                     if btn_settings.is_clicked(event.pos):
                         interface_settings = InterfaceSettings()
                     if btn_chose_level.is_clicked(event.pos):
-                        pass
-                else:
+                        interface_level = InterfaceChoseLevel()
+                        interface_level.update(read_file=True)
+                elif interface_settings:
                     if interface_settings.close(event.pos):
                         interface_settings.kill()
                         interface_settings = None
@@ -245,6 +338,14 @@ def start_screen():
                             with open(settings_file_name, 'w') as f_write:
                                 f_write.writelines('\n'.join(map(str, change_settings)))
                         interface_settings.btn_close_message(event.pos)
+                elif interface_level:
+                    if interface_level.close(event.pos):
+                        interface_level.kill()
+                        interface_level = None
+                    if interface_level:
+                        index_level = interface_level.get_click(event.pos)
+                        if index_level >= 0:
+                            LEVELS.chose_level(level_chosen=index_level)
 
         start_sprites.draw(screen)
         pygame.display.flip()
