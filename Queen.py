@@ -40,7 +40,7 @@ class Queen(pygame.sprite.Sprite):
         self.kd = 0
         self.kd_reset = 240
         self.attack = False
-        self.speed = 4
+        self.speed = 2
 
         self.health_bar = pygame.sprite.Sprite()
         self.draw_health_bar()
@@ -97,7 +97,7 @@ class Queen(pygame.sprite.Sprite):
                 graph = Graph(sp=level, start=(self.pos[0] // tile_width, self.pos[1] // tile_height))
                 graph.set_goal((x // tile_width, y // tile_height))
                 self.cell_to_move = graph.get_path()
-                if self.cell_to_move:
+                if len(self.cell_to_move) > 1:
                     break
         if not self.cell_to_move and not self.define_direction:
             self.pos = self.rect.x, self.rect.y
