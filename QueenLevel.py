@@ -31,6 +31,10 @@ def draw_level(level_draw=None, index=0):
 
 
 def start_game():
+    for sprite in sprites:
+        sprite.kill()
+    for construction in constructions:
+        construction.kill()
     class_level = LEVELS.get_level()
     level_to_draw, index = class_level.get_level()
     color, player = draw_level(index=index, level_draw=level_to_draw)
