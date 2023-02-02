@@ -11,9 +11,7 @@ class Wizard(pygame.sprite.Sprite):
 
     def __init__(self, pos, target):
         super(Wizard, self).__init__(enemies, sprites)
-        print('pos', pos)
         self.rect = pygame.Rect(pos[0] * tile_width, pos[1] * tile_height, player_width, player_height)
-        print('rect', self.rect)
 
         self.target = target
         self.key = 'move1'
@@ -78,11 +76,11 @@ class Wizard(pygame.sprite.Sprite):
         else:
             self.left = True
         self.count_steps += 1
-        if self.count_steps == 10:
-            if self.vector == 'forward':
-                self.rect = self.rect.move(0, wizard_speed * (-1) ** self.flag)
-            else:
-                self.rect = self.rect.move(wizard_speed * (-1) ** self.flag, 0)
+        if self.vector == 'forward':
+            self.rect = self.rect.move(0, wizard_speed * (-1) ** self.flag)
+        else:
+            self.rect = self.rect.move(wizard_speed * (-1) ** self.flag, 0)
+        if self.count_steps == 5:
             if self.flag == 2:
                 self.flag = not self.flag
                 self.flag = 1

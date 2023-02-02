@@ -1,3 +1,4 @@
+import random
 from LoadLevel import constructions, horizontal_borders, vertical_borders, sprites
 from SETTINGS import tile_width, tile_height
 from walls_images import queen_wall_image, queen_path_image, start_wall_image, start_path_image, second_level_wall, \
@@ -20,7 +21,7 @@ class LevelSecondWall(pygame.sprite.Sprite):
     def __init__(self, pos):
         super(LevelSecondWall, self).__init__(constructions, sprites)
         self.rect = pygame.Rect(pos[0] * tile_width, pos[1] * tile_height, tile_width, tile_height)
-        self.image = LevelSecondWall.image
+        self.image = LevelSecondWall.image[random.randint(0, 1)]
 
 
 class LevelSecondPath(pygame.sprite.Sprite):
@@ -29,7 +30,7 @@ class LevelSecondPath(pygame.sprite.Sprite):
     def __init__(self, pos):
         super(LevelSecondPath, self).__init__(sprites)
         self.rect = pygame.Rect(pos[0] * tile_width, pos[1] * tile_height, tile_width, tile_height)
-        self.image = LevelSecondPath.image
+        self.image = LevelSecondPath.image[random.randint(0, 2)]
 
 
 class Border(pygame.sprite.Sprite):
