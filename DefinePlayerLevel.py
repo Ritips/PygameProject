@@ -23,7 +23,7 @@ class Level:
 
 class QueenLevel(Level):
     def __init__(self):
-        super(QueenLevel, self).__init__(current_level=1, level='first_level.txt')
+        super(QueenLevel, self).__init__(current_level=2, level='first_level.txt')
 
 
 class StartLevel(Level):
@@ -33,12 +33,12 @@ class StartLevel(Level):
 
 class SecondLevel(Level):
     def __init__(self):
-        super(SecondLevel, self).__init__(current_level=3, level='slime_level.txt')
+        super(SecondLevel, self).__init__(current_level=1, level='slime_level.txt')
 
 
 class FinishLevel(Level):
     def __init__(self):
-        super(FinishLevel, self).__init__(current_level=2, level='last_level.txt')
+        super(FinishLevel, self).__init__(current_level=3, level='last_level.txt')
 
 
 class Levels:

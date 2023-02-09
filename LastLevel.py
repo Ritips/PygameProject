@@ -13,7 +13,7 @@ back_to_start = False
 
 
 def draw_level(level_draw=None, index=0):
-    if index == 2:
+    if index == 3:
         return black, None
 
 

@@ -16,7 +16,7 @@ clock = pygame.time.Clock()
 
 
 def draw_level(level_draw=None, index=0):
-    if index == 3:
+    if index == 1:
         for i in range(len(level_draw)):
             for j in range(len(level_draw[i])):
                 if level_draw[i][j] == 'W':

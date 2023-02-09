@@ -290,6 +290,7 @@ class InterfaceChoseLevel(pygame.sprite.Sprite):
         btn = list(filter(lambda x: x.is_clicked(pos), self.buttons))
         if not btn:
             return -182
+        print('here')
         return int(btn[0].get_text())
 
     def close(self, pos):
