@@ -20,17 +20,21 @@ def main(lobby=True, index=None):
         if flag == 110102:
             main(lobby=False, index=1)
     if index == 1:
-        flag = queen_level()
+        flag = second_level()
         if flag == 110101:
             main()
         if flag == 110105:
             main(lobby=False, index=2)
     if index == 2:
+        flag = queen_level()
+        if flag == 110101:
+            main()
+        if flag == 110105:
+            main(lobby=False, index=3)
+    if index == 3:
         flag = start_last_level()
         if flag == 110110:
             main(index=0)
-    if index == 3:
-        flag = second_level()
 
 
 if __name__ == '__main__':

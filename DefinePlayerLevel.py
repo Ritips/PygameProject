@@ -43,7 +43,7 @@ class FinishLevel(Level):
 
 class Levels:
     def __init__(self):
-        self.all_levels = [StartLevel(), QueenLevel(), FinishLevel(), SecondLevel()]
+        self.all_levels = [StartLevel(), SecondLevel(), QueenLevel(), FinishLevel()]
         with open('data/levels.txt') as f:
             self.available_levels = list(map(int, map(str.strip, f.readlines())))
         self.current_level_index = None

@@ -5,6 +5,8 @@ from DefinePlayerLevel import *
 from SETTINGS import *
 from EscMenu import EscMenu
 from Wizard import Wizard
+from DeathHero import end_screen
+from WinScreen import win_screen
 import pygame
 
 
@@ -31,11 +33,9 @@ def draw_level(level_draw=None, index=0):
         return black, player
 
 
-def second_level():
-    for sprite in sprites:
-        sprite.kill()
-    for construction in constructions:
-        construction.kill()
+def start_second_level():
+    [sprite.kill() for sprite in sprites]
+    [construction.kill() for construction in constructions]
     class_level = LEVELS.get_level()
     level_to_draw, index = class_level.get_level()
     color, player = draw_level(index=index, level_draw=level_to_draw)
@@ -45,7 +45,10 @@ def second_level():
     while running:
         screen.fill(color)
         if player not in sprites:
-            return 110101
+            return 2
+        if not enemies.sprites():
+            LEVELS.finish_level()
+            return 3
         if esc_menu:
             pygame.mouse.set_visible(True)
             sprites.draw(screen)
@@ -62,7 +65,7 @@ def second_level():
                         sprites.empty()
                         enemies.empty()
                         group_player.empty()
-                        return 110101
+                        return 1
                 if event.type == pygame.KEYDOWN and event.key == 27:
                     esc_menu.kill()
                     esc_menu = None
@@ -86,3 +89,36 @@ def second_level():
         pygame.display.flip()
         clock.tick(FPS)
     return 0
+
+
+def restart_second_level():
+    result = end_screen(more_sprites=sprites)
+    if result == 11:
+        return 110101
+    elif result == 22:
+        return second_level_game(restart_func=True)
+
+
+def show_win_menu_second():
+    result = win_screen(more_sprites=sprites)
+    if result == 123:
+        return 110105
+    return 110101
+
+
+def second_level_game(restart_func=False):
+    [sprite.kill() for sprite in sprites]
+    [construction.kill() for construction in constructions]
+    if not restart_func:
+        return 110101
+    flag = start_second_level()
+    if flag == 1:
+        return 110101
+    elif flag == 2:
+        return restart_second_level()
+    elif flag == 3:
+        return show_win_menu_second()
+
+
+def second_level():
+    return second_level_game(restart_func=True)
