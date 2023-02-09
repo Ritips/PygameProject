@@ -33,7 +33,7 @@ class StartLevel(Level):
 
 class FinishLevel(Level):
     def __init__(self):
-        super(FinishLevel, self).__init__(current_level=5, level=None)
+        super(FinishLevel, self).__init__(current_level=2, level='last_level.txt')
 
 
 class Levels:
