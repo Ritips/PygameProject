@@ -100,7 +100,7 @@ def restart():
 def show_win_menu():
     result = win_screen(more_sprites=sprites)
     if result == 123:
-        return 110101
+        return 110105
     return 110101
 
 
