@@ -3,6 +3,7 @@ from QueenLevel import queen_level
 from StartScreen import start_screen
 from StartLevel import start_level_game
 from LastLevel import start_last_level
+from SecondLevel import second_level
 
 
 def main(lobby=True, index=None):
@@ -28,6 +29,8 @@ def main(lobby=True, index=None):
         flag = start_last_level()
         if flag == 110110:
             main(index=0)
+    if index == 3:
+        flag = second_level()
 
 
 if __name__ == '__main__':

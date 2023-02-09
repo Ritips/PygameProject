@@ -27,6 +27,14 @@ font_size = int(50 * width / 800)
 tile_width = int(50 * width / 800)
 tile_height = int(50 * height / 600)
 
+wizard_ball_width = int(20 * width / 800)
+wizard_ball_height = int(15 * height / 600)
+
+wizard_speed = int(2 * height / 600)
+wizard_width = int(10 * width // 800)
+wizard_height = int(15 * height // 600)
+
+second_level = 'slime_level.txt'
 level_first = 'first_level.txt'
 start_level = 'start_level.txt'
 finish_level = 'finish_level.txt'

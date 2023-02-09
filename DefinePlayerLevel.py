@@ -31,6 +31,11 @@ class StartLevel(Level):
         super(StartLevel, self).__init__(current_level=0, level='start_level.txt')
 
 
+class SecondLevel(Level):
+    def __init__(self):
+        super(SecondLevel, self).__init__(current_level=3, level='slime_level.txt')
+
+
 class FinishLevel(Level):
     def __init__(self):
         super(FinishLevel, self).__init__(current_level=2, level='last_level.txt')
@@ -38,7 +43,7 @@ class FinishLevel(Level):
 
 class Levels:
     def __init__(self):
-        self.all_levels = [StartLevel(), QueenLevel(), FinishLevel()]
+        self.all_levels = [StartLevel(), QueenLevel(), FinishLevel(), SecondLevel()]
         with open('data/levels.txt') as f:
             self.available_levels = list(map(int, map(str.strip, f.readlines())))
         self.current_level_index = None
