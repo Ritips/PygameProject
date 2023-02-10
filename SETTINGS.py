@@ -17,6 +17,8 @@ meteor_height = int(34 * height / 600)
 magic_ball_width = int(20 * width / 800)
 magic_ball_height = int(11 * height / 600)
 
+ghost_width, ghost_height, ghost_speed = player_width, player_height, player_speed
+
 hp_bar_height = 5 * height // 600
 
 button_width = int(200 * width / 800)
