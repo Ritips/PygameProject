@@ -6,7 +6,7 @@ from LastLevel import start_last_level
 from SecondLevel import second_level
 
 
-def main(lobby=True, index=None):
+def main(lobby=True, index=None):  # carry out switching between levels
     if lobby:
         start_screen()
         level, index = LEVELS.get_level().get_level()

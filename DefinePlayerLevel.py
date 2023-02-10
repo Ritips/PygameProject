@@ -1,7 +1,7 @@
 from LoadLevel import load_level
 
 
-class Level:
+class Level:  # Parent
     def __init__(self, current_level=None, level=None):
         self.finished = False
         self.current_level = current_level if current_level.__class__ == int else -2
@@ -20,6 +20,7 @@ class Level:
         return self.finished
 
 
+# children
 class QueenLevel(Level):
     def __init__(self):
         super(QueenLevel, self).__init__(current_level=2, level='first_level.txt')
@@ -40,15 +41,16 @@ class FinishLevel(Level):
         super(FinishLevel, self).__init__(current_level=3, level='last_level.txt')
 
 
-class Levels:
+class Levels:  # List of the levels. It must include all available levels
     def __init__(self):
+        # self.all_levels: levels should be in logical order
         self.all_levels = [StartLevel(), SecondLevel(), QueenLevel(), FinishLevel()]
-        with open('data/levels.txt') as f:
+        with open('data/levels.txt') as f:  # load available levels
             self.available_levels = list(map(int, map(str.strip, f.readlines())))
         self.current_level_index = None
         self.current_level = None
 
-    def finish_level(self):
+    def finish_level(self):  # finish level and write it in the levels.txt
         if self.current_level:
             self.current_level.change_status()
             with open('data/levels.txt', 'r') as file_levels:
@@ -61,12 +63,10 @@ class Levels:
                         print(el, file=file_levels_write)
             self.available_levels.append(self.current_level_index)
 
-    def chose_level(self, level_chosen=None):
+    def chose_level(self, level_chosen=None):  # selection of the levels
         if level_chosen.__class__ == int:
-            print('level chosen')
             self.current_level_index = level_chosen
         elif not self.available_levels:
-            print('no available levels')
             self.current_level_index = 0
 
         self.current_level = self.all_levels[self.current_level_index]
@@ -75,4 +75,4 @@ class Levels:
         return self.all_levels[self.current_level_index]
 
 
-LEVELS = Levels()
+LEVELS = Levels()  # this class combine all levels. It allows to switch between levels
