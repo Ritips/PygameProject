@@ -11,7 +11,7 @@ def main(lobby=True, index=None):
         start_screen()
         level, index = LEVELS.get_level().get_level()
     else:
-        if index:
+        if index.__class__ == int:
             LEVELS.chose_level(level_chosen=index)
     if index == 0:
         flag = start_level_game()

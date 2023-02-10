@@ -63,12 +63,13 @@ class Levels:
             self.available_levels.append(self.current_level_index)
 
     def chose_level(self, level_chosen=None):
-        if not self.available_levels:
-            self.current_level_index = 0
-        elif not level_chosen:
-            self.current_level_index = 0
-        else:
+        if level_chosen.__class__ == int:
+            print('level chosen')
             self.current_level_index = level_chosen
+        elif not self.available_levels:
+            print('no available levels')
+            self.current_level_index = 0
+
         self.current_level = self.all_levels[self.current_level_index]
 
     def get_level(self):

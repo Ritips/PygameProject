@@ -217,6 +217,7 @@ def start_level_game():
             exit_level = 0
             for sprite in sprites:
                 sprite.kill()
+            LEVELS.finish_level()
             return 110102
         sprites.draw(screen)
         sprites.update(check=pygame.key.get_pressed(), flag_change_image=change_image_time)
