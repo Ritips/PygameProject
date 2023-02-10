@@ -16,6 +16,8 @@ clock = pygame.time.Clock()
 
 
 def draw_level(level_draw=None, index=0):
+    pygame.mixer.music.load('data\\Matrix_3_cut.wav')
+    pygame.mixer.music.play(-1, 0.0)
     if index == 1:
         for i in range(len(level_draw)):
             for j in range(len(level_draw[i])):
