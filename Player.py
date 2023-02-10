@@ -46,7 +46,7 @@ class Player(pygame.sprite.Sprite):
 
     def update(self, check=None, flag_change_image=0, dmg_dealer=None, **kwargs):
         if not self.health:
-            self.kill()
+            self.kill(), self.hp_bar.kill(), self.damage_box.kill()
         if check:
             if not flag_change_image % 8:
                 self.move(check=check, flag_change_image=True)

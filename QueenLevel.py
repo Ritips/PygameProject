@@ -18,14 +18,17 @@ clock = pygame.time.Clock()
 
 def draw_level(level_draw=None, index=0):
     if index == 2:
+        x = y = 0
         for i in range(len(level_draw)):
             for j in range(len(level_draw[i])):
                 if level_draw[i][j] == 'W':
                     WallQueen((j, i))
                 else:
                     PathQueen((j, i))
+                if level_draw[i][j] == 'q':
+                    x, y = j, i
         player = Player((7 * tile_width, tile_height))
-        queen = Queen()
+        queen = Queen((x, y))
         queen.set_target(player)
         return purple, player
 

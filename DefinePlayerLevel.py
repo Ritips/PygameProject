@@ -1,4 +1,3 @@
-from SETTINGS import level_first, start_level
 from LoadLevel import load_level
 
 

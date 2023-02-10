@@ -300,7 +300,7 @@ class InterfaceChoseLevel(pygame.sprite.Sprite):
 
 
 def start_screen():
-    LEVELS.chose_level(level_chosen=0)
+    LEVELS.chose_level(level_chosen=2)
     StartScreen()
     btn_start = ButtonStartGame()
     btn_exit = ButtonExitGame()
