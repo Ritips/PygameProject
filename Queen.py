@@ -37,12 +37,15 @@ class Queen(pygame.sprite.Sprite):
         self.define_direction = False
         self.moving = False
 
+        self.division_3 = False
+        self.division_2 = False
+
         self.kd_self_bar_show = 100
         self.status_self_bar_show = False
         self.ways_to_attack = [0, 1, 2, 3, 4]  # 0-meteor, 1-magic_ball, 2-meteor2, 3-spawn barrier, 4-magic_ball_chase
         self.cell_to_move = []
 
-        self.kd_second = 5
+        self.kd_const_second = self.kd_second = 5
 
     def draw_health_bar(self):
         self.health_bar.rect = pygame.Rect(self.rect.x, self.rect.y - (10 * height // 600), player_width, hp_bar_height)
@@ -73,18 +76,11 @@ class Queen(pygame.sprite.Sprite):
         if not self.previous and not self.moving:
             self.previous = self.health
         if not self.moving and self.previous and self.previous - self.health >= (self.health / self.max_health) * 50:
-            while True:
-                if self.cell_to_move:
-                    break
-                x, y = random.randint(0, width - self.rect.x), random.randint(0, height - self.rect.y)
-                if pygame.sprite.spritecollideany(self, constructions):
-                    continue
-                self.previous = None
-                graph = Graph(sp=level, start=(self.pos[0] // tile_width, self.pos[1] // tile_height))
-                graph.set_goal((x // tile_width, y // tile_height))
-                self.cell_to_move = graph.get_path()
-                if len(self.cell_to_move) > 1:
-                    break
+            x, y = random.randint(0, width - self.rect.x), random.randint(0, height - self.rect.y)
+            self.previous = None
+            graph = Graph(sp=level, start=(self.pos[0] // tile_width, self.pos[1] // tile_height))
+            graph.set_goal((x // tile_width, y // tile_height))
+            self.cell_to_move = graph.get_path()
             self.logic_attack(const_way_attack=3)
 
         if not self.cell_to_move and not self.define_direction:
@@ -200,10 +196,12 @@ class Queen(pygame.sprite.Sprite):
             self.health -= dmg_dealer.damage
             if self.health > 0:
                 self.status_self_bar_show = 1
-                if self.health <= self.health // 3:
-                    self.kd_second = self.kd_second / 3
-                elif self.health <= self.health // 2:
-                    self.kd_second = self.kd_second / 2
+                if not self.division_3 and self.health <= self.health // 3:
+                    self.kd_second = self.kd_const_second / 3
+                    self.division_3 = True
+                elif not self.division_2 and self.health <= self.health // 2:
+                    self.kd_second = self.kd_const_second / 2
+                    self.division_2 = True
             else:
                 self.health = 0
                 self.status_self_bar_show = False
@@ -225,7 +223,7 @@ class Meteor(pygame.sprite.Sprite):
         super(Meteor, self).__init__(bullets, sprites)
         self.rect = pygame.Rect(pos[0], pos[1], meteor_width, meteor_height)
         self.damage_box = self.rect
-        self.damage = 15
+        self.damage = 7.5
         self.index = 0
         self.image = Meteor.images[self.index]
         self.kd = 0
@@ -255,7 +253,7 @@ class MagicBall(pygame.sprite.Sprite):
         self.damage_box = self.rect
         self.target = target
         self.index = 0
-        self.damage = 2
+        self.damage = 1
         self.life_time = 200
         self.life_time_count = 0
         self.speed = random.randint(1, 3)
@@ -301,25 +299,25 @@ class Barrier(pygame.sprite.Sprite):
     pygame.draw.rect(image, purple, (0, 0, tile_width, tile_height), 2 * width // 800)
 
     def __init__(self, pos):
-        super(Barrier, self).__init__(sprites, constructions, enemies)
+        super(Barrier, self).__init__(sprites, enemies, constructions)
         self.rect = pygame.Rect(pos[0] * tile_width, pos[1] * tile_height, tile_width, tile_height)
         self.damage_box = self.rect
         self.image = Barrier.image
         self.lifetime = time.time()
-        self.health = 8
-        self.damage = 1
+        self.damage = 0.5
+        self.health = 1
         self.attack_time = time.time()
 
     def update(self, dmg_dealer=None, **kwargs):
         moment_check = time.time()
-        if abs(self.lifetime - moment_check) >= 5:
+        if abs(self.lifetime - moment_check) >= 2.5:
             self.kill()
             return
-        if dmg_dealer:
-            self.get_hit(dmg_dealer)
         if abs(self.attack_time - moment_check) >= 0.5:
             [group_player.update(dmg_dealer=self) for el in group_player if pygame.sprite.collide_mask(self, el)]
             self.attack_time = moment_check
+        if dmg_dealer:
+            self.get_hit(dmg_dealer)
 
     def get_hit(self, dmg_dealer):
         damage_box = dmg_dealer.damage_box
