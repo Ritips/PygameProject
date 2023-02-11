@@ -16,41 +16,47 @@ screen = pygame.display.set_mode(size)
 clock = pygame.time.Clock()
 
 
-def draw_level(level_draw=None, index=0):  # draws sprites (player, enemies, walls)
+def draw_level(level_draw=None, index=0):
+    pygame.mixer.music.load('data\\Matrix_3_cut.wav')
+    pygame.mixer.music.play(-1, 0.0)
     if index == 2:
-        x = y = 0
         for i in range(len(level_draw)):
             for j in range(len(level_draw[i])):
                 if level_draw[i][j] == 'W':
                     WallQueen((j, i))
                 else:
                     PathQueen((j, i))
-                if level_draw[i][j] == 'q':
-                    x, y = j, i
         player = Player((7 * tile_width, tile_height))
-        queen = Queen((x, y))
+        queen = Queen()
         queen.set_target(player)
         return purple, player
 
 
 def start_game():
-    # deleting all previous sprites before drawing new sprites
-    [sprite.kill() for sprite in sprites], [construction.kill() for construction in constructions]
-    class_level = LEVELS.get_level()  # get level (It is class which is determined in DefinePlayer.py)
-    level_to_draw, index = class_level.get_level()  # get list of the symbols and index
-    color, player = draw_level(index=index, level_draw=level_to_draw)  # get color(background) and player
-    change_image_time = 0  # counter (kd) to switch image
+    for sprite in sprites:
+        sprite.kill()
+    for construction in constructions:
+        construction.kill()
+    class_level = LEVELS.get_level()
+    level_to_draw, index = class_level.get_level()
+    color, player = draw_level(index=index, level_draw=level_to_draw)
+    change_image_time = 0
     esc_menu = None
     running = True
     while running:
         screen.fill(color)
         if player not in sprites:
-            return 2  # key for queen_level_game()
+            pygame.mixer.music.stop()
+            pygame.mixer.music.load('data\\haha.mp3')
+            pygame.mixer.music.play(1, 0.0)
+            return 2
         if not enemies.sprites():
+            pygame.mixer.music.stop()
             LEVELS.finish_level()
-            return 3  # key for queen_level_game()
-        if esc_menu:  # is EscMenu opened
-            pygame.mouse.set_visible(True)  # make cursor visible
+            return 3
+        if esc_menu:
+            pygame.mixer.music.stop()
+            pygame.mouse.set_visible(True)
             sprites.draw(screen)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -65,48 +71,51 @@ def start_game():
                         sprites.empty()
                         enemies.empty()
                         group_player.empty()
-                        return 1  # key for queen_level_game()
+                        return 1
                 if event.type == pygame.KEYDOWN and event.key == 27:
                     esc_menu.kill()
                     esc_menu = None
             pygame.display.flip()
-            continue  # to freeze another processes such as movement hero, enemies or another objects
-        pygame.mouse.set_visible(False)  # make cursor invisible for beauty
+            pygame.mixer.music.load('data\\Matrix_3_cut.wav')
+            pygame.mixer.music.play(-1, 0.0)
+            continue
+        pygame.mouse.set_visible(False)
         change_image_time += 1
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 exit()
-            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and not player.check_kd():  # attack
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and not player.check_kd():
                 player.func_attack(True)
-            if event.type == pygame.KEYDOWN and event.key == 27:  # call EscMenu
+            if event.type == pygame.KEYDOWN and event.key == 27:
                 esc_menu = EscMenu()
         if not change_image_time % 80:
             change_image_time = 0
         sprites.draw(screen)
         sprites.update(check=pygame.key.get_pressed(), flag_change_image=change_image_time)
-        pygame.display.set_caption(str(clock.get_fps()))  # title of the screen
+        pygame.display.set_caption(str(clock.get_fps()))
         pygame.display.flip()
         clock.tick(FPS)
     return 0
 
 
 def restart():
-    result = end_screen(more_sprites=sprites)  # call EndScreen. Sprites ara given for the background
+    result = end_screen(more_sprites=sprites)
     if result == 11:
-        return 110101  # this key is used to return to the lobby (start screen)
+        return 110101
     elif result == 22:
-        return queen_level_game(restart_func=True)  # restart
+        return queen_level_game(restart_func=True)
 
 
 def show_win_menu():
-    result = win_screen(more_sprites=sprites)  # call WinScreen. Sprites are given for the background
+    result = win_screen(more_sprites=sprites)
     if result == 123:
-        return 110105  # this key is used to select next level
-    return 110101  # this key is used to return to the lobby (start screen)
+        return 110105
+    return 110101
 
 
 def queen_level_game(restart_func=False):
-    [sprite.kill() for sprite in sprites]  # delete all sprites to minimise resources
+    for sprite in sprites:
+        sprite.kill()
     if not restart_func:  # start menu
         return 110101
     flag = start_game()
@@ -118,5 +127,5 @@ def queen_level_game(restart_func=False):
         return show_win_menu()
 
 
-def queen_level():  # start function
+def queen_level():
     return queen_level_game(restart_func=True)
