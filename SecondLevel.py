@@ -47,11 +47,16 @@ def start_second_level():
     while running:
         screen.fill(color)
         if player not in sprites:
+            pygame.mixer.music.stop()
+            pygame.mixer.music.load('data\\haha.mp3')
+            pygame.mixer.music.play(1, 0.0)
             return 2
         if not enemies.sprites():
+            pygame.mixer.music.stop()
             LEVELS.finish_level()
             return 3
         if esc_menu:
+            pygame.mixer.music.stop()
             pygame.mouse.set_visible(True)
             sprites.draw(screen)
             for event in pygame.event.get():
@@ -72,6 +77,8 @@ def start_second_level():
                     esc_menu.kill()
                     esc_menu = None
             pygame.display.flip()
+            pygame.mixer.music.load('data\\Matrix_3_cut.wav')
+            pygame.mixer.music.play(-1, 0.0)
             continue
         pygame.mouse.set_visible(False)
         change_image_time += 1
