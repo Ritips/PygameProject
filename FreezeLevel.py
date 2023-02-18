@@ -84,7 +84,7 @@ class BookCase(CommonObject):  # you can find here more books than usually
         self.image = BookCase.image
         self.interface = BookCaseInterface()
 
-    def update(self, press_e=False, **kwargs):
+    def update(self, press_e=False, close=False, **kwargs):
         if self.interface in sprites and not self.check_pos_player(dx=0, dy=0):
             self.interface.remove(sprites), inventory_group.update(close_inventory=True)
             self.interface.remove(other_interface_opened)
@@ -95,6 +95,8 @@ class BookCase(CommonObject):  # you can find here more books than usually
             else:
                 self.interface.remove(sprites), inventory_group.update(close_inventory=True)
                 self.interface.remove(other_interface_opened)
+        if close:
+            self.interface.update(close=close)
 
 
 class BookCaseInterface(pygame.sprite.Sprite):
@@ -139,7 +141,17 @@ class BookInterface(pygame.sprite.Sprite):
         self.rect = pygame.Rect(200 * width // 800, 100 * height // 600, 400 * width // 800, 450 * height // 600)
         self.read = pygame.Rect(self.rect.x, 525 * height // 600, self.rect.w, 25 * height // 600)
         self.image = pygame.Surface(self.rect.size, pygame.SRCALPHA, 32)
+        self.font_size = 40 * width // 800
+        self.font = pygame.font.Font(None, self.font_size)
         self.image.fill(dark_grey)
+        try:
+            with open(file, 'r', encoding='utf-8') as f_book:
+                self.content = list(map(str.strip, f_book.readlines()))
+        except FileNotFoundError:
+            self.content = []
+        for i in range(len(self.content)):
+            text = self.font.render(self.content[i], True, white)
+            self.image.blit(text, (10 * width // 800, 5 * height // 600 + self.font_size * i))
         line = 3 * width // 800
         pygame.draw.rect(self.image, light_grey, (0, 425 * height // 600, self.rect.w, 25 * height // 600), line)
         pygame.draw.rect(self.image, light_grey, (0, 0, self.rect.w, self.rect.h), line)
@@ -178,11 +190,11 @@ class BookIcon(CellItem):
         w2, h2 = self.size[0] - 2 * w_space, self.size[-1] - 2 * h_space
         pygame.draw.rect(self.image, random.choice(colors), (w_space, h_space, w2, h2))
         self.empty = False
-        self.interface = BookInterface()
+        self.interface = BookInterface(file='motherfucker')
 
     def get_content(self):
+        inventory_group.update(close_inventory=True), [sprite.kill() for sprite in other_interface_opened]
         self.interface.add(sprites)
-        inventory_group.update(close_inventory=True), other_interface_opened.update(close=True)
 
 
 # to see some items. For instance, book
@@ -357,7 +369,7 @@ def start_freeze_level_game():
                     inventory_group.update(), other_interface_opened.update()
                     open_content.update(click_pos=event.pos)
                 else:
-                    if not other_interface_opened.sprites() and inventory_group.sprites() not in sprites:
+                    if other_interface_opened.sprites() not in sprites and inventory_group.sprites() not in sprites:
                         player.func_attack(True)
                     else:
                         inventory_group.update(click_pos=event.pos)
