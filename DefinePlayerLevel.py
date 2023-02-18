@@ -38,13 +38,23 @@ class SecondLevel(Level):
 
 class FinishLevel(Level):
     def __init__(self):
-        super(FinishLevel, self).__init__(current_level=3, level='last_level.txt')
+        super(FinishLevel, self).__init__(current_level=4, level='last_level.txt')
+
+
+class FreezeLevel(Level):
+    def __init__(self):
+        super(FreezeLevel, self).__init__(current_level=3, level='FreezeLevel.txt')
+
+
+class GhostLevel(Level):
+    def __init__(self):
+        super(GhostLevel, self).__init__(current_level=5, level='CheckDefinePlayer.py to define txt file of the level')
 
 
 class Levels:  # List of the levels. It must include all available levels
     def __init__(self):
         # self.all_levels: levels should be in logical order
-        self.all_levels = [StartLevel(), SecondLevel(), QueenLevel(), FinishLevel()]
+        self.all_levels = [StartLevel(), SecondLevel(), QueenLevel(), FreezeLevel(), FinishLevel(), GhostLevel()]
         with open('data/levels.txt') as f:  # load available levels
             self.available_levels = list(map(int, map(str.strip, f.readlines())))
         self.current_level_index = None
