@@ -17,7 +17,7 @@ booster = 1
 
 
 def draw_level(level_draw=None, index=0):
-    if index == 3:
+    if index == 4:
         return black, None
 
 
