@@ -4,7 +4,7 @@ from Constructions import *
 from LoadLevel import *
 from DefinePlayerLevel import *
 from SETTINGS import *
-from FreezeImages import fireplace, bookcase_png
+from FreezeImages import fireplace, bookcase_png, music_system
 from WinScreen import win_screen
 from EscMenu import EscMenu
 import pygame
@@ -18,6 +18,8 @@ clock = pygame.time.Clock()
 inventory_group = pygame.sprite.Group()
 other_interface_opened = pygame.sprite.Group()
 open_content = pygame.sprite.Group()
+item_group_position = pygame.sprite.Group()
+furniture = pygame.sprite.Group()
 
 
 # creating some objects especially for the level
@@ -68,7 +70,14 @@ class CommonObject(pygame.sprite.Sprite):
 # for first task (each item should be in each corner)
 class Item(CommonObject):
     def __init__(self, pos):
-        super(Item, self).__init__(pos)
+        super(Item, self).__init__(pos, groups=(sprites, item_group_position, furniture))
+        self.image = music_system
+
+    def update(self, press_c=False, remove_self=False, **kwargs):
+        if group_player.sprites() in sprites:
+            self.target = group_player.sprites()[0]
+        if press_c and self.check_pos_player():
+            inventory_group.update(item=ItemIcon((0, 0)), item_sprite=self)
 
 
 # just market to switch rooms
@@ -81,7 +90,7 @@ class BookCase(CommonObject):  # you can find here more books than usually
     image = bookcase_png
 
     def __init__(self, pos, file=None):
-        super(BookCase, self).__init__(pos)
+        super(BookCase, self).__init__(pos, groups=(sprites, furniture))
         self.image = BookCase.image
         self.interface = BookCaseInterface(file=file)
 
@@ -234,6 +243,25 @@ class BookIcon(CellItem):
         self.interface.add(sprites), self.interface.add(open_content)
 
 
+class ItemIcon(CellItem):
+    def __init__(self, pos):
+        super(ItemIcon, self).__init__(pos)
+        self.empty = False
+        self.image = pygame.transform.scale(music_system, (60 * width // 800, 50 * height // 600))
+
+    def get_content(self):
+        player = group_player.sprites()[0]
+        x, y = player.rect.x // tile_width, player.rect.y // tile_height
+        t = CommonObject((x, y), groups=(other_interface_opened, ))
+        if pygame.sprite.spritecollideany(t, constructions) or pygame.sprite.spritecollideany(t, furniture):
+            t.kill()
+            inventory_group.update(item=ItemIcon((0, 0)))
+            return
+        t.kill()
+        Item((x, y))
+        inventory_group.update(close_inventory=True)
+
+
 # to see some items. For instance, book
 class Inventory(pygame.sprite.Sprite):
     def __init__(self):
@@ -255,7 +283,8 @@ class Inventory(pygame.sprite.Sprite):
         pygame.draw.rect(self.image, light_grey, (0, 0, w, h), w_line)
         [pygame.draw.rect(self.image, light_grey, (i, 0, w_cell, h), w_line) for i in range(0, w, w_cell)]
 
-    def update(self, press_b=False, close_inventory=False, click_pos=None, btn_click=None, item=None, **kwargs):
+    def update(self, press_b=False, close_inventory=False, click_pos=None,
+               btn_click=None, item=None, item_sprite=None, **kwargs):
         if press_b:
             if other_interface_opened:
                 self.add(sprites)
@@ -267,11 +296,15 @@ class Inventory(pygame.sprite.Sprite):
             res = self.click_cell(click_pos)
             if res[0]:
                 if not btn_click:
-                    self.items[res[-1]].get_content()
+                    el = self.items[res[-1]]
+                    if el.__class__ == ItemIcon:
+                        self.remove_item(res[-1], other_interface=False)
+                    el.get_content()
                 else:
                     self.remove_item(res[-1])
         if item:
-            self.add_item(item)
+            if self.add_item(item) and item_sprite:
+                item_sprite.kill()
         self.redraw_items()
 
     def click_cell(self, pos):
@@ -281,22 +314,20 @@ class Inventory(pygame.sprite.Sprite):
         return False, False
 
     def add_item(self, item):
-        success = False
         for i in range(len(self.items)):
             if self.items[i].check_empty():
                 item.rect = item.rect.move(self.rect.x + i * self.const[-1], self.rect.y)
                 self.items[i] = item
-                success = True
-                break
-        if not success:
-            other_interface_opened.update(item=item)
+                return True
+        other_interface_opened.update(item=item)
         return False
 
-    def remove_item(self, index):
+    def remove_item(self, index, other_interface=True):
         item = self.items[index]
         if not item.check_empty():
             self.items[index] = CellItem((self.rect.x + self.const[-1] * index, self.rect.y))
-            other_interface_opened.update(item=item)
+            if other_interface:
+                other_interface_opened.update(item=item)
 
 
 # To open the second door
@@ -351,6 +382,7 @@ def draw_level(level_draw=None, index=0):  # draws sprites (player, enemies, wal
         some_objects = []
         tmp_x = tmp_y = 0
         bookcase_count = 1
+        Item((6, 4))
         for i in range(y):
             for j in range(x):
                 if level_draw[i][j] == 'F':
@@ -380,6 +412,7 @@ def start_freeze_level_game():
     inventory_group.update(item=BookIcon((0, 0), 'freezelevel/conditions.txt'))
     inventory_group.update(item=BookIcon((0, 0), 'freezelevel/settings.txt'))
     inventory_group.update(click_pos=(160 * width // 800, 275 * height // 600))
+    inventory_group.update(item=ItemIcon((0, 0)))
 
     while running:
         screen.fill(color)
@@ -441,11 +474,19 @@ def start_freeze_level_game():
                     sprites.update(press_e=True)
                 elif event.key == 98 and not open_content.sprites() in sprites:
                     inventory_group.update(press_b=True)
+                elif event.key == 99:
+                    furniture.update(press_c=True)
         if not change_image_time % 80:
             change_image_time = 0
         sprites.draw(screen)
+        group_player.draw(screen)
+        if inventory_group.sprites() in sprites:
+            inventory_group.draw(screen)
+        if other_interface_opened.sprites() in sprites:
+            other_interface_opened.draw(screen)
         if open_content.sprites() in sprites:
             sprites.update(can_move=False, check=pygame.key.get_pressed(), flag_change_image=change_image_time)
+            open_content.draw(screen)
         else:
             sprites.update(check=pygame.key.get_pressed(), flag_change_image=change_image_time)
         pygame.display.set_caption(str(clock.get_fps()))  # title of the screen
