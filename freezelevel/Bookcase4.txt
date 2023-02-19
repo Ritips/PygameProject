@@ -1,0 +1,11 @@
+freezelevel/book4.txt
+freezelevel/book8.txt
+freezelevel/book1.txt
+freezelevel/book2.txt
+freezelevel/book10.txt
+freezelevel/busy.txt
+freezelevel/selection_profession.txt
+freezelevel/content1.txt
+freezelevel/content2.txt
+freezelevel/content3.txt
+freezelevel/task1_part3.txt

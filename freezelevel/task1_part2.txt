@@ -1,0 +1,6 @@
+Hey! It can be useful for your task
+You should place item in the right
+place, shouldn't you?
+Place item in the upper left room
+Exact coord: (2, 5) starting from the left
+and starting from the top. Counting from one
