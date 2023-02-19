@@ -8,6 +8,7 @@ from FreezeImages import fireplace, bookcase_png
 from WinScreen import win_screen
 from EscMenu import EscMenu
 import pygame
+import random
 
 
 pygame.init()
@@ -79,10 +80,10 @@ class Door(CommonObject):
 class BookCase(CommonObject):  # you can find here more books than usually
     image = bookcase_png
 
-    def __init__(self, pos):
+    def __init__(self, pos, file=None):
         super(BookCase, self).__init__(pos)
         self.image = BookCase.image
-        self.interface = BookCaseInterface()
+        self.interface = BookCaseInterface(file=file)
 
     def update(self, press_e=False, close=False, **kwargs):
         if self.interface in sprites and not self.check_pos_player(dx=0, dy=0):
@@ -100,7 +101,7 @@ class BookCase(CommonObject):  # you can find here more books than usually
 
 
 class BookCaseInterface(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, file=None):
         super(BookCaseInterface, self).__init__()
         w, h = 600 * width // 800, 200 * height // 600
         w_cell, h_cell, w_line = 60 * width // 800, 50 * height // 600, 2 * width // 800
@@ -110,20 +111,43 @@ class BookCaseInterface(pygame.sprite.Sprite):
         self.image.fill(dark_grey)
         self.items = [[CellItem((self.rect.x + w_cell * x,
                                  self.rect.y + h_cell * y)) for x in range(w // w_cell)] for y in range(h // h_cell)]
+        if file:
+            try:
+                with open(file, 'r', encoding='utf-8') as inventory_file:
+                    for el in map(str.strip, inventory_file.readlines()):
+                        self.append_item(BookIcon((0, 0), el))
+            except FileNotFoundError:
+                pass
+
+    def append_item(self, item):
+        for y in range(len(self.items)):
+            for x in range(len(self.items[0])):
+                if self.items[y][x].check_empty():
+                    item.rect = item.rect.move(self.rect.x + x * self.const[-2], self.rect.y + y * self.const[3])
+                    self.items[y][x] = item
+                    return True
+        return False
+
+    def remove_item(self, pos):
+        pass
 
     def redraw_items(self):
         w, h, w_cell, h_cell, w_line = self.const
         pygame.draw.rect(self.image, light_grey, (0, 0, w, h), 3 * width // 800)
-        for y in range(0, h, h_cell):
-            for x in range(0, w, w_cell):
-                pygame.draw.rect(self.image, light_grey, (x, y, w_cell, h_cell), w_line)
+        [self.image.blit(self.items[i][j].image, (j * w_cell, i * h_cell))
+         for i in range(len(self.items)) for j in range(len(self.items[0]))]
+        [pygame.draw.rect(self.image, light_grey, (x, y, w_cell, h_cell), w_line)
+         for y in range(0, h, h_cell) for x in range(0, w, w_cell)]
 
-    def update(self, click_pos=None, close=False, **kwargs):
+    def update(self, click_pos=None, btn=None, close=False, **kwargs):
         if click_pos:
             res = self.get_click(click_pos)
             if res[0]:
                 x, y = res[-1]
-                self.items[y][x].get_content()
+                if not btn:
+                    self.items[y][x].get_content()
+                else:  # put item in chest/bookcase/inventory
+                    pass
         if close:
             self.remove(sprites)
         self.redraw_items()
@@ -137,11 +161,11 @@ class BookCaseInterface(pygame.sprite.Sprite):
 
 class BookInterface(pygame.sprite.Sprite):
     def __init__(self, file=None):
-        super(BookInterface, self).__init__(open_content)
+        super(BookInterface, self).__init__()
         self.rect = pygame.Rect(200 * width // 800, 100 * height // 600, 400 * width // 800, 450 * height // 600)
         self.read = pygame.Rect(self.rect.x, 525 * height // 600, self.rect.w, 25 * height // 600)
         self.image = pygame.Surface(self.rect.size, pygame.SRCALPHA, 32)
-        self.font_size = 40 * width // 800
+        self.font_size = 25 * width // 800
         self.font = pygame.font.Font(None, self.font_size)
         self.image.fill(dark_grey)
         try:
@@ -158,7 +182,7 @@ class BookInterface(pygame.sprite.Sprite):
 
     def update(self, click_pos=None, close=False, **kwargs):
         if close or (click_pos and self.confirm_reading(click_pos)):
-            self.remove(sprites)
+            self.kill()
 
     def confirm_reading(self, pos):
         x, y, w, h = self.read
@@ -183,18 +207,19 @@ class CellItem(pygame.sprite.Sprite):
 
 
 class BookIcon(CellItem):
-    def __init__(self, pos):
+    def __init__(self, pos, file):
         super(BookIcon, self).__init__(pos)
-        colors = [purple]
+        r, g, b = random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)
         w_space, h_space = 15 * width // 800, 5 * height // 600
         w2, h2 = self.size[0] - 2 * w_space, self.size[-1] - 2 * h_space
-        pygame.draw.rect(self.image, random.choice(colors), (w_space, h_space, w2, h2))
+        pygame.draw.rect(self.image, (r, g, b), (w_space, h_space, w2, h2))
+        pygame.draw.rect(self.image, black, (w_space, h_space, w2, h2), 3 * width // 800)
         self.empty = False
-        self.interface = BookInterface(file='motherfucker')
+        self.interface = BookInterface(file=file)
 
     def get_content(self):
         inventory_group.update(close_inventory=True), [sprite.kill() for sprite in other_interface_opened]
-        self.interface.add(sprites)
+        self.interface.add(sprites), self.interface.add(open_content)
 
 
 # to see some items. For instance, book
@@ -207,8 +232,6 @@ class Inventory(pygame.sprite.Sprite):
         self.image = pygame.Surface((w, h), pygame.SRCALPHA, 32)
         self.image.fill(dark_grey)
         self.items = [CellItem((self.rect.x + w_cell * i, self.rect.y)) for i in range(10)]
-        book = BookIcon((0, 0))
-        self.add_item(book)
         pygame.draw.rect(self.image, light_grey, (0, 0, w, h), w_line)
         [pygame.draw.rect(self.image, light_grey, (i, 0, w_cell, h), w_line) for i in range(0, w, w_cell)]
 
@@ -299,6 +322,7 @@ def draw_level(level_draw=None, index=0):  # draws sprites (player, enemies, wal
         [WallCastle((j, i)) if level_draw[i][j] == 'W' else PathCastle((j, i)) for i in range(y) for j in range(x)]
         some_objects = []
         tmp_x = tmp_y = 0
+        bookcase_count = 1
         for i in range(y):
             for j in range(x):
                 if level_draw[i][j] == 'F':
@@ -307,7 +331,8 @@ def draw_level(level_draw=None, index=0):  # draws sprites (player, enemies, wal
                 elif level_draw[i][j] == 'P':
                     tmp_x, tmp_y = j * tile_width, i * tile_height
                 elif level_draw[i][j] == 'B':
-                    object_bookcase = BookCase((j, i))
+                    object_bookcase = BookCase((j, i), file=f'freezelevel/Bookcase{bookcase_count}.txt')
+                    bookcase_count += 1
                     some_objects.append(object_bookcase)
         player = Player((tmp_x, tmp_y))
         [el.set_target(player) for el in some_objects]
