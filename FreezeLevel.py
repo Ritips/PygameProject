@@ -120,16 +120,25 @@ class BookCaseInterface(pygame.sprite.Sprite):
                 pass
 
     def append_item(self, item):
+        success = False
         for y in range(len(self.items)):
             for x in range(len(self.items[0])):
                 if self.items[y][x].check_empty():
                     item.rect = item.rect.move(self.rect.x + x * self.const[-2], self.rect.y + y * self.const[3])
                     self.items[y][x] = item
-                    return True
-        return False
+                    success = True
+                    break
+            if success:
+                break
+        if not success:
+            inventory_group.update(item=item)
 
     def remove_item(self, pos):
-        pass
+        x, y = pos
+        item = self.items[y][x]
+        if not item.check_empty():
+            self.items[y][x] = CellItem((self.rect.x + x * self.const[2], self.rect.y + y * self.const[3]))
+            inventory_group.update(item=item)
 
     def redraw_items(self):
         w, h, w_cell, h_cell, w_line = self.const
@@ -139,17 +148,19 @@ class BookCaseInterface(pygame.sprite.Sprite):
         [pygame.draw.rect(self.image, light_grey, (x, y, w_cell, h_cell), w_line)
          for y in range(0, h, h_cell) for x in range(0, w, w_cell)]
 
-    def update(self, click_pos=None, btn=None, close=False, **kwargs):
+    def update(self, click_pos=None, btn_click=None, close=False, item=None, **kwargs):
         if click_pos:
             res = self.get_click(click_pos)
             if res[0]:
                 x, y = res[-1]
-                if not btn:
+                if not btn_click:
                     self.items[y][x].get_content()
                 else:  # put item in chest/bookcase/inventory
-                    pass
+                    self.remove_item(res[-1])
         if close:
             self.remove(sprites)
+        if item:
+            self.append_item(item)
         self.redraw_items()
 
     def get_click(self, pos):
@@ -197,6 +208,7 @@ class CellItem(pygame.sprite.Sprite):
         self.size = w_cell, h_cell = 60 * width // 800, 50 * height // 600
         self.rect = pygame.Rect(pos[0], pos[1], self.size[0], self.size[1])
         self.image = pygame.Surface((self.size[0], self.size[-1]), pygame.SRCALPHA, 32)
+        self.image.fill(dark_grey)
         self.empty = True
 
     def check_empty(self):
@@ -243,7 +255,7 @@ class Inventory(pygame.sprite.Sprite):
         pygame.draw.rect(self.image, light_grey, (0, 0, w, h), w_line)
         [pygame.draw.rect(self.image, light_grey, (i, 0, w_cell, h), w_line) for i in range(0, w, w_cell)]
 
-    def update(self, press_b=False, close_inventory=False, click_pos=None, **kwargs):
+    def update(self, press_b=False, close_inventory=False, click_pos=None, btn_click=None, item=None, **kwargs):
         if press_b:
             if other_interface_opened:
                 self.add(sprites)
@@ -254,7 +266,12 @@ class Inventory(pygame.sprite.Sprite):
         if click_pos:
             res = self.click_cell(click_pos)
             if res[0]:
-                self.items[res[-1]].get_content()
+                if not btn_click:
+                    self.items[res[-1]].get_content()
+                else:
+                    self.remove_item(res[-1])
+        if item:
+            self.add_item(item)
         self.redraw_items()
 
     def click_cell(self, pos):
@@ -264,11 +281,22 @@ class Inventory(pygame.sprite.Sprite):
         return False, False
 
     def add_item(self, item):
+        success = False
         for i in range(len(self.items)):
             if self.items[i].check_empty():
                 item.rect = item.rect.move(self.rect.x + i * self.const[-1], self.rect.y)
                 self.items[i] = item
+                success = True
                 break
+        if not success:
+            other_interface_opened.update(item=item)
+        return False
+
+    def remove_item(self, index):
+        item = self.items[index]
+        if not item.check_empty():
+            self.items[index] = CellItem((self.rect.x + self.const[-1] * index, self.rect.y))
+            other_interface_opened.update(item=item)
 
 
 # To open the second door
@@ -399,6 +427,10 @@ def start_freeze_level_game():
                     else:
                         inventory_group.update(click_pos=event.pos)
                         other_interface_opened.update(click_pos=event.pos)
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
+                if other_interface_opened.sprites() in sprites and inventory_group.sprites() in sprites:
+                    other_interface_opened.update(click_pos=event.pos, btn_click=True)
+                    inventory_group.update(click_pos=event.pos, btn_click=True)
             if event.type == pygame.KEYDOWN:  # key press
                 if event.key == 27:  # call EscMenu
                     esc_menu = EscMenu()
