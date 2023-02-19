@@ -163,7 +163,10 @@ class BookCaseInterface(pygame.sprite.Sprite):
             if res[0]:
                 x, y = res[-1]
                 if not btn_click:
-                    self.items[y][x].get_content()
+                    if self.items[y][x].__class__ == ItemIcon:
+                        pass
+                    else:
+                        self.items[y][x].get_content()
                 else:  # put item in chest/bookcase/inventory
                     self.remove_item(res[-1])
         if close:
@@ -382,7 +385,6 @@ def draw_level(level_draw=None, index=0):  # draws sprites (player, enemies, wal
         some_objects = []
         tmp_x = tmp_y = 0
         bookcase_count = 1
-        Item((6, 4))
         for i in range(y):
             for j in range(x):
                 if level_draw[i][j] == 'F':
@@ -392,11 +394,27 @@ def draw_level(level_draw=None, index=0):  # draws sprites (player, enemies, wal
                     tmp_x, tmp_y = j * tile_width, i * tile_height
                 elif level_draw[i][j] == 'B':
                     object_bookcase = BookCase((j, i), file=f'freezelevel/Bookcase{bookcase_count}.txt')
+                    if bookcase_count != 2:
+                        object_bookcase.interface.append_item(ItemIcon((0, 0)))
                     bookcase_count += 1
                     some_objects.append(object_bookcase)
         player = Player((tmp_x, tmp_y))
         [el.set_target(player) for el in some_objects]
         return dark_grey, player
+
+
+def complete_task_order():
+    left = right = bottom = False
+    for sprite in item_group_position:
+        if sprite.rect.x // tile_width == 1 and sprite.rect.y // tile_height == 4:
+            left = True
+        elif sprite.rect.x // tile_width == 14 and sprite.rect.y // tile_height == 1:
+            right = True
+        elif 8 < sprite.rect.x // tile_width < 15 and sprite.rect.y // tile_height == 10:
+            bottom = True
+    if left and right and bottom:
+        return True
+    return False
 
 
 def start_freeze_level_game():
@@ -408,13 +426,15 @@ def start_freeze_level_game():
     esc_menu = None
     running = True
     pass_level = False
+    task1 = False
     Inventory()
     inventory_group.update(item=BookIcon((0, 0), 'freezelevel/conditions.txt'))
     inventory_group.update(item=BookIcon((0, 0), 'freezelevel/settings.txt'))
     inventory_group.update(click_pos=(160 * width // 800, 275 * height // 600))
-    inventory_group.update(item=ItemIcon((0, 0)))
 
     while running:
+        if not task1 and complete_task_order():
+            task1 = True
         screen.fill(color)
         if player not in sprites:
             return 2
