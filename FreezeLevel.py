@@ -377,6 +377,9 @@ def start_freeze_level_game():
     running = True
     pass_level = False
     Inventory()
+    inventory_group.update(item=BookIcon((0, 0), 'freezelevel/conditions.txt'))
+    inventory_group.update(item=BookIcon((0, 0), 'freezelevel/settings.txt'))
+    inventory_group.update(click_pos=(160 * width // 800, 275 * height // 600))
 
     while running:
         screen.fill(color)
