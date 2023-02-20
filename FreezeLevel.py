@@ -31,7 +31,7 @@ class FreezeBar(pygame.sprite.Sprite):
         self.image = pygame.Surface((tile_width * 2, tile_height // 4), pygame.SRCALPHA, 32)
         self.image.fill(black)
         self.freeze_counter = 0
-        self.freeze_counter_maximum = 4000
+        self.freeze_counter_maximum = 4000 * FPS // 60
 
     def update(self, heat=False, **kwargs):
         if heat and self.freeze_counter > 1:
@@ -358,7 +358,132 @@ class Key(pygame.sprite.Sprite):
 
 # to be honest I don't know for what this class. Maybe it will be a loader and container for txt file
 class Room:
-    pass
+    def __init__(self, player_pos):
+        self.player_pos = player_pos  # to return Player back
+        [sprite.kill() for sprite in group_player]
+        self.pos = (3, 3)
+        self.level = 'freezelevel/room.txt'
+        self.room_sprites = pygame.sprite.Group()
+        self.status = False
+        self.inventory = None
+        self.player = None
+
+    def change_status(self):
+        self.status = True
+
+    def set_inventory(self, inventory):
+        self.inventory = inventory
+
+    def get_status(self):
+        return self.status
+
+    def load_level(self):
+        if not self.status:
+            return
+        delete_sprites()
+        with open(self.level, 'r', encoding='utf-8') as f_room:
+            map_room = list(map(str.strip, f_room.readlines()))
+        x, y = len(map_room[0]), len(map_room)
+        [WallCastle((j, i)) if map_room[i][j] == 'W' else PathCastle((j, i)) for i in range(y) for j in range(x)]
+        group = []
+        for i in range(y):
+            for j in range(x):
+                if map_room[i][j] == 'D':
+                    self.pos = (j * tile_width, i * tile_height)
+                    group.append(Door((j, i), task=1))
+                elif map_room[i][j] == 'F':
+                    group.append(FirePlace((j, i)))
+        self.player = Player(self.pos)
+        self.inventory.add(inventory_group)
+        [el.set_target(self.player) for el in group]
+        return self.start_game()
+
+    def start_game(self):
+        change_image_time = 0
+        esc_menu = None
+        running = True
+        FreezeBar((0, 0.6))
+        player = self.player
+        pass_level = False
+        task1 = True
+
+        while running:
+            screen.fill(dark_grey)
+            if player not in sprites:
+                return 2
+            if pass_level:
+                return 3
+            if esc_menu:  # is EscMenu opened
+                pygame.mouse.set_visible(True)  # make cursor visible
+                sprites.draw(screen)
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        exit()
+                    if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                        if esc_menu.close(event.pos):
+                            exit()
+                        elif esc_menu.continue_game(event.pos):
+                            esc_menu.kill()
+                            esc_menu = None
+                        elif esc_menu.return_start_menu(event.pos):
+                            sprites.empty()
+                            enemies.empty()
+                            group_player.empty()
+                            return 1  # key for queen_level_game()
+                    if event.type == pygame.KEYDOWN and event.key == 27:
+                        esc_menu.kill()
+                        esc_menu = None
+                pygame.display.flip()
+                continue  # to freeze another processes such as movement hero, enemies or another objects
+
+            if not inventory_group.sprites() in sprites and not open_content.sprites() in sprites:
+                pygame.mouse.set_visible(False)  # make cursor invisible for beauty
+            else:
+                pygame.mouse.set_visible(True)
+            change_image_time += 1
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    exit()
+                if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and not player.check_kd():  # attack
+                    if open_content.sprites() in sprites:
+                        open_content.update(click_pos=event.pos)
+                    else:
+                        if other_interface_opened.sprites() not in sprites and inventory_group.sprites() not in sprites:
+                            player.func_attack(True)
+                        else:
+                            inventory_group.update(click_pos=event.pos)
+                            other_interface_opened.update(click_pos=event.pos)
+                if event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
+                    if other_interface_opened.sprites() in sprites and inventory_group.sprites() in sprites:
+                        other_interface_opened.update(click_pos=event.pos, btn_click=True)
+                        inventory_group.update(click_pos=event.pos, btn_click=True)
+                if event.type == pygame.KEYDOWN:  # key press
+                    if event.key == 27:  # call EscMenu
+                        esc_menu = EscMenu()
+                    elif event.key == 101 and not open_content.sprites() in sprites:
+                        furniture.update(press_e=True, task1=task1)
+                    elif event.key == 98 and not open_content.sprites() in sprites:
+                        inventory_group.update(press_b=True)
+                    elif event.key == 99:
+                        furniture.update(press_c=True)
+            if not change_image_time % 80:
+                change_image_time = 0
+            sprites.draw(screen)
+            group_player.draw(screen)
+            if inventory_group.sprites() in sprites:
+                inventory_group.draw(screen)
+            if other_interface_opened.sprites() in sprites:
+                other_interface_opened.draw(screen)
+            if open_content.sprites() in sprites:
+                group_player.update(can_move=False, check=pygame.key.get_pressed(), flag_change_image=change_image_time)
+                open_content.draw(screen)
+            else:
+                sprites.update(check=pygame.key.get_pressed(), flag_change_image=change_image_time)
+            freeze_bar_group.update(), furniture.update()
+            pygame.display.set_caption(str(clock.get_fps()))  # title of the screen
+            pygame.display.flip()
+            clock.tick(FPS)
 
 
 # for my teammate. It was an argument why hi didn't want to do something.
@@ -438,11 +563,12 @@ def complete_task_order():
             bottom = True
     if left and right and bottom:
         return True
-    return False
+    #return False
+    return True
 
 
 def start_freeze_level_game():
-    [sprite.kill() for sprite in sprites], [construction.kill() for construction in constructions]
+    delete_sprites()
     class_level = LEVELS.get_level()  # it doesn't work now (Level not defined in DefinePlayerLevel.py)
     level_to_draw, index = class_level.get_level()
     color, player = draw_level(level_draw=level_to_draw, index=index)
@@ -451,15 +577,23 @@ def start_freeze_level_game():
     running = True
     pass_level = False
     task1 = False
-    Inventory()
+    task2 = False
+    inventory = Inventory()
     FreezeBar((0, 0.6))
     inventory_group.update(item=BookIcon((0, 0), 'freezelevel/conditions.txt'))
     inventory_group.update(item=BookIcon((0, 0), 'freezelevel/settings.txt'))
     inventory_group.update(click_pos=(160 * width // 800, 275 * height // 600))
+    room1 = None
 
     while running:
         if not task1 and complete_task_order():
             task1 = True
+            x, y = player.rect.x // tile_width, player.rect.y // tile_height
+            room1 = Room((x, y))
+            room1.change_status()
+            room1.set_inventory(inventory)
+        if room1 and room1.get_status():
+            print(room1.load_level())
         screen.fill(color)
         if player not in sprites:
             return 2
@@ -514,7 +648,7 @@ def start_freeze_level_game():
                 if event.key == 27:  # call EscMenu
                     esc_menu = EscMenu()
                 elif event.key == 101 and not open_content.sprites() in sprites:
-                    furniture.update(press_e=True)
+                    furniture.update(press_e=True, task1=task1, task2=task2)
                 elif event.key == 98 and not open_content.sprites() in sprites:
                     inventory_group.update(press_b=True)
                 elif event.key == 99:
@@ -554,11 +688,15 @@ def win_func():
     return 110101
 
 
-def freeze_game(restart=False):
+def delete_sprites():
     [sprite.kill() for sprite in sprites], [construction.kill() for construction in constructions]
     [sprite.kill() for sprite in open_content], [sprite.kill() for sprite in other_interface_opened]
     [sprite.kill() for sprite in freeze_bar_group], [sprite.kill() for sprite in furniture]
     [sprite.kill() for sprite in item_group_position], [sprite.kill() for sprite in inventory_group]
+
+
+def freeze_game(restart=False):
+    delete_sprites()
     if not restart:
         return 110101
     flag = start_freeze_level_game()
