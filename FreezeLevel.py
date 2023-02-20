@@ -4,7 +4,7 @@ from Constructions import *
 from LoadLevel import *
 from DefinePlayerLevel import *
 from SETTINGS import *
-from FreezeImages import fireplace, bookcase_png, music_system
+from FreezeImages import fireplace, bookcase_png, music_system, door
 from WinScreen import win_screen
 from EscMenu import EscMenu
 import pygame
@@ -82,8 +82,16 @@ class Item(CommonObject):
 
 # just market to switch rooms
 class Door(CommonObject):
-    def __init__(self, pos):
-        super(Door, self).__init__(pos)
+    def __init__(self, pos, task=None):
+        super(Door, self).__init__(pos, groups=(sprites, furniture))
+        self.image = door
+        self.task = task
+
+    def update(self, task1=False, task2=False, **kwargs):
+        if task1 == self.task and self.check_pos_player():
+            print('Task1')
+        if task2 == self.task and self.check_pos_player():
+            print('Task2')
 
 
 class BookCase(CommonObject):  # you can find here more books than usually
@@ -136,10 +144,12 @@ class BookCaseInterface(pygame.sprite.Sprite):
                     item.rect = item.rect.move(self.rect.x + x * self.const[-2], self.rect.y + y * self.const[3])
                     self.items[y][x] = item
                     success = True
+                    self.redraw_items()
                     break
             if success:
                 break
         if not success:
+            self.redraw_items()
             inventory_group.update(item=item)
 
     def remove_item(self, pos):
@@ -148,6 +158,7 @@ class BookCaseInterface(pygame.sprite.Sprite):
         if not item.check_empty():
             self.items[y][x] = CellItem((self.rect.x + x * self.const[2], self.rect.y + y * self.const[3]))
             inventory_group.update(item=item)
+            self.redraw_items()
 
     def redraw_items(self):
         w, h, w_cell, h_cell, w_line = self.const
@@ -173,7 +184,6 @@ class BookCaseInterface(pygame.sprite.Sprite):
             self.remove(sprites)
         if item:
             self.append_item(item)
-        self.redraw_items()
 
     def get_click(self, pos):
         if self.rect.y <= pos[-1] <= self.rect.y + self.rect.h:
@@ -308,7 +318,6 @@ class Inventory(pygame.sprite.Sprite):
         if item:
             if self.add_item(item) and item_sprite:
                 item_sprite.kill()
-        self.redraw_items()
 
     def click_cell(self, pos):
         if self.rect.y <= pos[-1] <= self.rect.y + self.rect.h:
@@ -321,8 +330,10 @@ class Inventory(pygame.sprite.Sprite):
             if self.items[i].check_empty():
                 item.rect = item.rect.move(self.rect.x + i * self.const[-1], self.rect.y)
                 self.items[i] = item
+                self.redraw_items()
                 return True
         other_interface_opened.update(item=item)
+        self.redraw_items()
         return False
 
     def remove_item(self, index, other_interface=True):
@@ -331,6 +342,7 @@ class Inventory(pygame.sprite.Sprite):
             self.items[index] = CellItem((self.rect.x + self.const[-1] * index, self.rect.y))
             if other_interface:
                 other_interface_opened.update(item=item)
+            self.redraw_items()
 
 
 # To open the second door
@@ -349,7 +361,7 @@ class FirePlace(CommonObject):  # Central hitting
     images = fireplace
 
     def __init__(self, pos):
-        super(FirePlace, self).__init__(pos, groups=(sprites, constructions))
+        super(FirePlace, self).__init__(pos, groups=(sprites, constructions, furniture))
         self.status = False  # turned on/off
         self.key = 0
         self.image = FirePlace.images[self.key]
@@ -385,6 +397,7 @@ def draw_level(level_draw=None, index=0):  # draws sprites (player, enemies, wal
         some_objects = []
         tmp_x = tmp_y = 0
         bookcase_count = 1
+        door_task_count = 1
         for i in range(y):
             for j in range(x):
                 if level_draw[i][j] == 'F':
@@ -398,6 +411,9 @@ def draw_level(level_draw=None, index=0):  # draws sprites (player, enemies, wal
                         object_bookcase.interface.append_item(ItemIcon((0, 0)))
                     bookcase_count += 1
                     some_objects.append(object_bookcase)
+                elif level_draw[i][j] == 'D':
+                    some_objects.append(Door((j, i), task=door_task_count))
+                    door_task_count += 1
         player = Player((tmp_x, tmp_y))
         [el.set_target(player) for el in some_objects]
         return dark_grey, player
@@ -475,7 +491,6 @@ def start_freeze_level_game():
                 exit()
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and not player.check_kd():  # attack
                 if open_content.sprites() in sprites:
-                    inventory_group.update(), other_interface_opened.update()
                     open_content.update(click_pos=event.pos)
                 else:
                     if other_interface_opened.sprites() not in sprites and inventory_group.sprites() not in sprites:
@@ -491,7 +506,7 @@ def start_freeze_level_game():
                 if event.key == 27:  # call EscMenu
                     esc_menu = EscMenu()
                 elif event.key == 101 and not open_content.sprites() in sprites:
-                    sprites.update(press_e=True)
+                    furniture.update(press_e=True)
                 elif event.key == 98 and not open_content.sprites() in sprites:
                     inventory_group.update(press_b=True)
                 elif event.key == 99:
@@ -505,7 +520,7 @@ def start_freeze_level_game():
         if other_interface_opened.sprites() in sprites:
             other_interface_opened.draw(screen)
         if open_content.sprites() in sprites:
-            sprites.update(can_move=False, check=pygame.key.get_pressed(), flag_change_image=change_image_time)
+            group_player.update(can_move=False, check=pygame.key.get_pressed(), flag_change_image=change_image_time)
             open_content.draw(screen)
         else:
             sprites.update(check=pygame.key.get_pressed(), flag_change_image=change_image_time)

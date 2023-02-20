@@ -1,6 +1,6 @@
 WWWWWWWWWWWWWWWW
 WB....WP..W....W
-W.....W.F.W....W
+W.....W.F.WD...W
 W..W.WW...WWW..W
 W..W......B....W
 WWWW.WWWWWWW.WWW
@@ -8,5 +8,5 @@ W..W.W....W....W
 W..W.W....WWw..W
 W....W...BW....W
 WWWW.W..WWW..WWW
-WB.....WW......W
+WB.....WD......W
 WWWWWWWWWWWWWWWW

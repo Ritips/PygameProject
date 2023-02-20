@@ -23,4 +23,5 @@ fireplace = {0: fire_place0, 1: fire_place1, 2: fire_place2, 3: fire_place3}
 freeze_transform_images(fireplace)
 
 bookcase_png = freeze_transform_image(load_image('BookCase.png'), dx=2, dy=2)
+door = freeze_transform_image(load_image('Door.png'), dx=1, dy=1)
 music_system = freeze_transform_image(load_image('music_system.png'))
