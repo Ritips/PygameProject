@@ -2,7 +2,7 @@ settings_file_name = 'data/SETTINGS.txt'
 with open(settings_file_name) as f:  # load file with settings
     size = width, height = list(map(int, f.readlines()))
 
-FPS = 60
+FPS = 100
 
 player_speed = int(2 * height / 600)
 player_width = int(50 * width // 800)
@@ -42,6 +42,7 @@ start_level = 'start_level.txt'
 finish_level = 'finish_level.txt'
 
 black = (0, 0, 0)
+blue = (0, 0, 255)
 red = (255, 0, 0)
 white = (255, 255, 255)
 purple = (63, 18, 75)

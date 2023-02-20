@@ -20,24 +20,30 @@ other_interface_opened = pygame.sprite.Group()
 open_content = pygame.sprite.Group()
 item_group_position = pygame.sprite.Group()
 furniture = pygame.sprite.Group()
+freeze_bar_group = pygame.sprite.Group()
 
 
 # creating some objects especially for the level
-class Button(pygame.sprite.Sprite):  # Button that can carry out click function
-    def __init__(self, pos, w, h):
-        super(Button, self).__init__(sprites)
-        self.pos_x, self.pos_y = pos
-        self.image = pygame.Surface((w, h), pygame.SRCALPHA, 32)
-        pygame.draw.rect(self.image, dark_grey, (0, 0, w, h))
-        pygame.draw.rect(self.image, light_grey, (0, 0, w, h), 3)
-        self.font = pygame.font.Font(None, font_size)
-        self.space_y = int(8 * height / 600)
+class FreezeBar(pygame.sprite.Sprite):
+    def __init__(self, pos):
+        super(FreezeBar, self).__init__(sprites, freeze_bar_group)
+        self.rect = pygame.Rect(pos[0] * tile_width, pos[1] * tile_height, tile_width * 2, tile_height // 4)
+        self.image = pygame.Surface((tile_width * 2, tile_height // 4), pygame.SRCALPHA, 32)
+        self.image.fill(black)
+        self.freeze_counter = 0
+        self.freeze_counter_maximum = 4000
 
-    def is_clicked(self, pos):
-        if pos[0] in range(self.rect.x, self.rect.x + self.rect.w + 1):
-            if pos[1] in range(self.rect.y, self.rect.y + self.rect.h + 1):
-                return True
-        return False
+    def update(self, heat=False, **kwargs):
+        if heat and self.freeze_counter > 1:
+            self.freeze_counter -= 2
+        else:
+            self.freeze_counter += 1
+        self.image.fill(black)
+        f_w = self.freeze_counter * self.rect.w // self.freeze_counter_maximum
+        if abs(self.freeze_counter - self.freeze_counter_maximum) < 5:
+            [sprite.kill() for sprite in group_player]
+        pygame.draw.rect(self.image, blue, (0, 0, f_w, tile_height // 4))
+        pygame.draw.rect(self.image, black, (0, 0, 2 * tile_width, tile_height // 4), 2 * width // 800)
 
 
 class CommonObject(pygame.sprite.Sprite):
@@ -376,6 +382,8 @@ class FirePlace(CommonObject):  # Central hitting
         self.status = 1 if not self.status else 0
 
     def update(self, flag_change_image=0, press_e=False, **kwargs):
+        if self.check_pos_player(dx=self.dx * 4, dy=self.dy * 4) and self.status:
+            freeze_bar_group.update(heat=True)
         if press_e:
             self.change_status()
         if self.status and flag_change_image % 8 == 0:
@@ -444,6 +452,7 @@ def start_freeze_level_game():
     pass_level = False
     task1 = False
     Inventory()
+    FreezeBar((0, 0.6))
     inventory_group.update(item=BookIcon((0, 0), 'freezelevel/conditions.txt'))
     inventory_group.update(item=BookIcon((0, 0), 'freezelevel/settings.txt'))
     inventory_group.update(click_pos=(160 * width // 800, 275 * height // 600))
@@ -456,7 +465,6 @@ def start_freeze_level_game():
             return 2
         if pass_level:
             return 3
-
         if esc_menu:  # is EscMenu opened
             pygame.mouse.set_visible(True)  # make cursor visible
             sprites.draw(screen)
@@ -524,6 +532,7 @@ def start_freeze_level_game():
             open_content.draw(screen)
         else:
             sprites.update(check=pygame.key.get_pressed(), flag_change_image=change_image_time)
+        freeze_bar_group.update(), furniture.update()
         pygame.display.set_caption(str(clock.get_fps()))  # title of the screen
         pygame.display.flip()
         clock.tick(FPS)
@@ -547,6 +556,9 @@ def win_func():
 
 def freeze_game(restart=False):
     [sprite.kill() for sprite in sprites], [construction.kill() for construction in constructions]
+    [sprite.kill() for sprite in open_content], [sprite.kill() for sprite in other_interface_opened]
+    [sprite.kill() for sprite in freeze_bar_group], [sprite.kill() for sprite in furniture]
+    [sprite.kill() for sprite in item_group_position], [sprite.kill() for sprite in inventory_group]
     if not restart:
         return 110101
     flag = start_freeze_level_game()
