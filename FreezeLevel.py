@@ -95,7 +95,7 @@ class Door(CommonObject):
         self.task = task
 
     def update(self, task1=False, task2=False, staff=None, **kwargs):
-        if staff and (staff[0] == 1 and self.task == staff[0]) and self.check_pos_player():
+        if task1 == 1 and staff and (staff[0] == 1 and self.task == staff[0]) and self.check_pos_player():
             if staff[3]:
                 staff[2].set_inventory(staff[1])
                 staff[2].change_status()
@@ -393,6 +393,7 @@ class Room:
         for sprite in furniture:
             self.save_furniture.add(sprite)
             furniture.remove(sprite), sprites.remove(sprite), constructions.remove(sprite)
+            item_group_position.remove(sprite)
         [sprite.kill() for sprite in group_player]
         delete_sprites()
         with open(self.level, 'r', encoding='utf-8') as f_room:
@@ -598,8 +599,7 @@ def complete_task_order():
             bottom = True
     if left and right and bottom:
         return True
-    #return False
-    return True
+    return False
 
 
 def start_freeze_level_game():
