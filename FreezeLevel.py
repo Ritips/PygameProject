@@ -22,6 +22,7 @@ item_group_position = pygame.sprite.Group()
 furniture = pygame.sprite.Group()
 freeze_bar_group = pygame.sprite.Group()
 global_value_check_player = False
+global_value_complete_task2 = False
 
 
 # creating some objects especially for the level
@@ -111,6 +112,7 @@ class Door(CommonObject):
         self.task = task
 
     def update(self, task1=False, task2=False, staff=None, **kwargs):
+        global global_value_complete_task2
         if task1 == 1 and staff and (staff[0] == 1 and self.task == staff[0]) and self.check_pos_player():
             if staff[3]:
                 staff[2].set_inventory(staff[1])
@@ -120,6 +122,8 @@ class Door(CommonObject):
                     res = staff[2].get_reset()
                     reset_main_level(res[0], res[1])
                     staff[2].change_status()
+        if task2 and self.check_pos_player():
+            global_value_complete_task2 = True
 
 
 class BookCase(CommonObject):  # you can find here more books than usually
@@ -310,7 +314,7 @@ class KeyIcon(CellItem):
         self.image = pygame.transform.scale(key_image, (60 * width // 800, 50 * height // 600))
 
     def get_content(self):
-        print('line 313')
+        furniture.update(task2=2)
 
 
 # to see some items. For instance, book
@@ -641,7 +645,7 @@ def complete_task_order():
 
 
 def start_freeze_level_game():
-    global global_value_check_player
+    global global_value_check_player, global_value_complete_task2
     delete_sprites()
     class_level = LEVELS.get_level()  # it doesn't work now (Level not defined in DefinePlayerLevel.py)
     level_to_draw, index = class_level.get_level()
@@ -649,7 +653,6 @@ def start_freeze_level_game():
     change_image_time = 0
     esc_menu = None
     running = True
-    pass_level = False
     task1 = task2 = 0
     inventory = Inventory()
     FreezeBar((0, 0.6))
@@ -671,7 +674,8 @@ def start_freeze_level_game():
                 return 2
         if player not in sprites and not global_value_check_player:
             return 2
-        if pass_level:
+        if global_value_complete_task2:
+            global_value_complete_task2 = False
             return 3
         if esc_menu:  # is EscMenu opened
             pygame.mouse.set_visible(True)  # make cursor visible
