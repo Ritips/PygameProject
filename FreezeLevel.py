@@ -73,7 +73,7 @@ class CommonObject(pygame.sprite.Sprite):
                 return True
         return False
 
-'''
+
 class Chest(CommonObject):
     def __init__(self, pos):
         super(Chest, self).__init__(pos, groups=(sprites, furniture))
@@ -84,11 +84,11 @@ class Chest(CommonObject):
         if group_player.sprites() in sprites:
             self.target = group_player.sprites()[0]
         if press_e and self.key_contain and self.check_pos_player():
-            #  inventory_group.update(item=KeyIcon((0, 0)), chest=self)
             self.key_contain = False
+            inventory_group.update(item=KeyIcon((0, 0)), chest=self)
         if reset_key:
             self.key_contain = True
-'''
+
 
 # for first task (each item should be in each corner)
 class Item(CommonObject):
@@ -302,7 +302,7 @@ class ItemIcon(CellItem):
         Item((x, y))
         inventory_group.update(close_inventory=True)
 
-'''
+
 class KeyIcon(CellItem):
     def __init__(self, pos):
         super(KeyIcon, self).__init__(pos)
@@ -310,8 +310,8 @@ class KeyIcon(CellItem):
         self.image = pygame.transform.scale(key_image, (60 * width // 800, 50 * height // 600))
 
     def get_content(self):
-        print('here')
-'''
+        print('line 313')
+
 
 # to see some items. For instance, book
 class Inventory(pygame.sprite.Sprite):
@@ -354,11 +354,12 @@ class Inventory(pygame.sprite.Sprite):
                 else:
                     self.remove_item(res[-1])
         if item:
-            if self.add_item(item) and item_sprite:
-                item_sprite.kill()
-        '''if chest:
-            if item and not self.add_item(item):
-                chest.update(reset_key=True)'''
+            if self.add_item(item):
+                if item_sprite:
+                    item_sprite.kill()
+            else:
+                if chest:
+                    chest.update(reset_key=True)
 
     def click_cell(self, pos):
         if self.rect.y <= pos[-1] <= self.rect.y + self.rect.h:
@@ -437,8 +438,8 @@ class Room:
                         group.append(Door((j, i), task=1))
                     elif map_room[i][j] == 'F':
                         group.append(FirePlace((j, i)))
-                    '''elif map_room[i][j] == 'C':
-                        group.append(Chest((j, i)))'''
+                    elif map_room[i][j] == 'C':
+                        group.append(Chest((j, i)))
             [self.room_sprites.add(el) for el in group]
         else:
             for el in self.room_sprites:
@@ -636,7 +637,7 @@ def complete_task_order():
             bottom = True
     if left and right and bottom:
         return True
-    return True
+    return False
 
 
 def start_freeze_level_game():
