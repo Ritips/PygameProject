@@ -1,3 +1,4 @@
+import time
 from LoadLevel import *
 import pygame
 from SETTINGS import *
@@ -13,34 +14,22 @@ class Queen(pygame.sprite.Sprite):
 
     def __init__(self, pos=None, target=None):
         super(Queen, self).__init__(enemies, sprites)
-        if pos:
-            self.rect = pygame.Rect(pos[0], pos[1], player_width, player_height)
-        else:
-            for i in range(len(level)):
-                for j in range(len(level[0])):
-                    if level[i][j] == 'q':
-                        pos = j * tile_width, i * tile_height
-                        break
-                if pos:
-                    break
-            self.rect = pygame.Rect(pos[0], pos[1], player_width, player_height)
+        self.rect = pygame.Rect(pos[0] * tile_width, pos[1] * tile_height, player_width, player_height)
         self.target = target
         self.key = 'front_stay'
         self.bullets = pygame.sprite.Group()  # for some bullets like magic ball and meteor
-        self.allies = pygame.sprite.Group()  # to spawn more enemies
         image = Queen.images[self.key]
         self.image = image
         self.pos = pos
 
         # queen constants
-        self.max_health = 350
-        self.health = 350
+        self.max_health = 200
+        self.health = 200
         self.previous = None
         self.damage = 100
-        self.kd = 0
-        self.kd_reset = 240
-        self.attack = False
         self.speed = 2
+
+        self.attack_time = time.time()
 
         self.health_bar = pygame.sprite.Sprite()
         self.draw_health_bar()
@@ -48,10 +37,15 @@ class Queen(pygame.sprite.Sprite):
         self.define_direction = False
         self.moving = False
 
+        self.division_3 = False
+        self.division_2 = False
+
         self.kd_self_bar_show = 100
         self.status_self_bar_show = False
-        self.ways_to_attack = [0, 1, 2, 3, 4]  # 0-meteor, 1-magic_ball, 2-meteor2, 3-spawn enemy, 4-magic_ball_chase
+        self.ways_to_attack = [0, 1, 2, 3, 4]  # 0-meteor, 1-magic_ball, 2-meteor2, 3-spawn barrier, 4-magic_ball_chase
         self.cell_to_move = []
+
+        self.kd_const_second = self.kd_second = 5
 
     def draw_health_bar(self):
         self.health_bar.rect = pygame.Rect(self.rect.x, self.rect.y - (10 * height // 600), player_width, hp_bar_height)
@@ -74,11 +68,6 @@ class Queen(pygame.sprite.Sprite):
             else:
                 self.status_self_bar_show += 1
             self.show_health_bar()
-        if self.attack:
-            self.kd += 1
-            if self.kd == self.kd_reset:
-                self.kd = 0
-                self.attack = False
         self.logic_attack()
         self.logic_move(flag_change_image=(False if flag_change_image % 8 else True))
         self.image = Queen.images[self.key]
@@ -87,18 +76,13 @@ class Queen(pygame.sprite.Sprite):
         if not self.previous and not self.moving:
             self.previous = self.health
         if not self.moving and self.previous and self.previous - self.health >= (self.health / self.max_health) * 50:
-            while True:
-                if self.cell_to_move:
-                    break
-                x, y = random.randint(0, width - self.rect.x), random.randint(0, height - self.rect.y)
-                if pygame.sprite.spritecollideany(self, constructions):
-                    continue
-                self.previous = None
-                graph = Graph(sp=level, start=(self.pos[0] // tile_width, self.pos[1] // tile_height))
-                graph.set_goal((x // tile_width, y // tile_height))
-                self.cell_to_move = graph.get_path()
-                if len(self.cell_to_move) > 1:
-                    break
+            x, y = random.randint(0, width - self.rect.x), random.randint(0, height - self.rect.y)
+            self.previous = None
+            graph = Graph(sp=level, start=(self.pos[0] // tile_width, self.pos[1] // tile_height))
+            graph.set_goal((x // tile_width, y // tile_height))
+            self.cell_to_move = graph.get_path()
+            self.logic_attack(const_way_attack=3)
+
         if not self.cell_to_move and not self.define_direction:
             self.pos = self.rect.x, self.rect.y
             self.move()
@@ -124,41 +108,50 @@ class Queen(pygame.sprite.Sprite):
         elif dy < 0:
             self.move(flag_change_image=flag_change_image, up=True)
 
-    def logic_attack(self):
+    def logic_attack(self, const_way_attack=None):
         if not self.target or not group_player.has(self.target):
             self.key = 'front_stay'
             return
         x, y = self.target.rect.x, self.target.rect.y
-        if not self.kd:
-            self.kd = 1
-            self.attack = True
+        if abs(self.attack_time - time.time()) >= self.kd_second and not const_way_attack:
             way_attack = random.choice(self.ways_to_attack)
-            if not way_attack:  # meteor
-                for _ in range(15):
-                    meteor_x = x + random.randint(-player_width * 2, player_width * 2)
-                    meteor_y = y + random.randint(-player_height * 2, player_height * 2)
-                    Meteor((meteor_x, meteor_y))
-            elif way_attack == 1 and self.target:
-                x1, y1 = self.rect.x, self.rect.y
-                count_magic_ball = random.randint(2, 4)
-                dy = -count_magic_ball // 2 * magic_ball_height
-                for i in range(count_magic_ball):  # magic_ball
-                    dy += magic_ball_height
-                    MagicBall((x1, y1 + dy), target=self.target)
-            elif way_attack == 2:  # more meteors, xD
-                for _ in range(5):
-                    meteor_x = x + random.randint(-player_width * 2, player_width * 2)
-                    meteor_y = y + random.randint(-player_height * 2, player_height * 2)
-                    Meteor((meteor_x, meteor_y), kd_limit=10)
-            elif way_attack == 3:  # spawn enemy
-                pass
-            elif way_attack == 4:
-                x1, y1 = self.rect.x, self.rect.y
-                count_magic_ball = random.randint(2, 4)
-                dy = -count_magic_ball // 2 * magic_ball_height
-                for i in range(count_magic_ball):  # magic_ball_chase
-                    dy += magic_ball_height
-                    MagicBall((x1, y1 + dy), target=self.target, chase_player=True)
+            self.attack_time = time.time()
+        elif const_way_attack:
+            way_attack = const_way_attack
+        else:
+            return
+
+        if not way_attack:  # meteor
+            for _ in range(15):
+                meteor_x = x + random.randint(-player_width * 2, player_width * 2)
+                meteor_y = y + random.randint(-player_height * 2, player_height * 2)
+                Meteor((meteor_x, meteor_y))
+
+        elif way_attack == 1 and self.target:
+            x1, y1 = self.rect.x, self.rect.y
+            count_magic_ball = random.randint(2, 4)
+            dy = -count_magic_ball // 2 * magic_ball_height
+            for i in range(count_magic_ball):  # magic_ball
+                dy += magic_ball_height
+                MagicBall((x1, y1 + dy), target=self.target)
+
+        elif way_attack == 2:  # more meteors, xD
+            for _ in range(5):
+                meteor_x = x + random.randint(-player_width * 2, player_width * 2)
+                meteor_y = y + random.randint(-player_height * 2, player_height * 2)
+                Meteor((meteor_x, meteor_y), kd_limit=10)
+
+        elif way_attack == 3:  # spawn barrier
+            tile_x, tile_y = self.target.rect.x // tile_width, self.target.rect.y // tile_height
+            [Barrier((tile_x - i, tile_y - j)) for i in [-1, 0, 1] for j in [-1, 0, 1]]
+
+        elif way_attack == 4:
+            x1, y1 = self.rect.x, self.rect.y
+            count_magic_ball = random.randint(2, 4)
+            dy = -count_magic_ball // 2 * magic_ball_height
+            for i in range(count_magic_ball):  # magic_ball_chase
+                dy += magic_ball_height
+                MagicBall((x1, y1 + dy), target=self.target, chase_player=True)
 
     def move(self, flag_change_image=False, up=False, down=False, left=False, right=False):
         move_side = False
@@ -203,6 +196,12 @@ class Queen(pygame.sprite.Sprite):
             self.health -= dmg_dealer.damage
             if self.health > 0:
                 self.status_self_bar_show = 1
+                if not self.division_3 and self.health <= self.health // 3:
+                    self.kd_second = self.kd_const_second / 3
+                    self.division_3 = True
+                elif not self.division_2 and self.health <= self.health // 2:
+                    self.kd_second = self.kd_const_second / 2
+                    self.division_2 = True
             else:
                 self.health = 0
                 self.status_self_bar_show = False
@@ -224,7 +223,7 @@ class Meteor(pygame.sprite.Sprite):
         super(Meteor, self).__init__(bullets, sprites)
         self.rect = pygame.Rect(pos[0], pos[1], meteor_width, meteor_height)
         self.damage_box = self.rect
-        self.damage = 15
+        self.damage = 7.5
         self.index = 0
         self.image = Meteor.images[self.index]
         self.kd = 0
@@ -254,7 +253,7 @@ class MagicBall(pygame.sprite.Sprite):
         self.damage_box = self.rect
         self.target = target
         self.index = 0
-        self.damage = 0.5
+        self.damage = 1
         self.life_time = 200
         self.life_time_count = 0
         self.speed = random.randint(1, 3)
@@ -292,3 +291,38 @@ class MagicBall(pygame.sprite.Sprite):
     def transform_image(self):
         if self.target.rect.x - self.rect.x > 0:
             self.image = pygame.transform.flip(self.image, True, False)
+
+
+class Barrier(pygame.sprite.Sprite):
+    image = pygame.Surface((tile_width, tile_height), pygame.SRCALPHA, 32)
+    image.fill((63, 18, 75, 150))
+    pygame.draw.rect(image, purple, (0, 0, tile_width, tile_height), 2 * width // 800)
+
+    def __init__(self, pos):
+        super(Barrier, self).__init__(sprites, enemies, constructions)
+        self.rect = pygame.Rect(pos[0] * tile_width, pos[1] * tile_height, tile_width, tile_height)
+        self.damage_box = self.rect
+        self.image = Barrier.image
+        self.lifetime = time.time()
+        self.damage = 0.5
+        self.health = 1
+        self.attack_time = time.time()
+
+    def update(self, dmg_dealer=None, **kwargs):
+        moment_check = time.time()
+        if abs(self.lifetime - moment_check) >= 2.5:
+            self.kill()
+            return
+        if abs(self.attack_time - moment_check) >= 0.5:
+            [group_player.update(dmg_dealer=self) for el in group_player if pygame.sprite.collide_mask(self, el)]
+            self.attack_time = moment_check
+        if dmg_dealer:
+            self.get_hit(dmg_dealer)
+
+    def get_hit(self, dmg_dealer):
+        damage_box = dmg_dealer.damage_box
+        if pygame.sprite.collide_rect(self, damage_box):
+            self.health -= dmg_dealer.damage
+            if self.health <= 0:
+                self.kill()
+                return

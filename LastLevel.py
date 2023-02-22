@@ -17,7 +17,7 @@ booster = 1
 
 
 def draw_level(level_draw=None, index=0):
-    if index == 3:
+    if index == 4:
         return black, None
 
 
@@ -80,6 +80,7 @@ def start_last_level():
         screen.fill(color)
         [exit() for event in pygame.event.get() if event.type == pygame.QUIT]
         if pygame.key.get_pressed()[pygame.K_ESCAPE] or back_to_start:
+            LEVELS.finish_level()
             [el.kill() for el in effects], [el.kill() for el in group_text]
             return 110110
         if abs(start_time - end_time) >= 2 / booster:

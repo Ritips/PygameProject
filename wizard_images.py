@@ -1,10 +1,21 @@
 from LoadImage import load_image
-from SETTINGS import wizard_ball_height, wizard_ball_width
+from SETTINGS import wizard_ball_height, wizard_ball_width, width, height
 import pygame
 
 
 def transform_image(image_to_transform):
     return pygame.transform.scale(image_to_transform, (wizard_ball_width, wizard_ball_height))
+
+
+def advance_transform_image(image):
+    x, y = image.get_size()
+    x, y = x * width // 800, y * height // 600
+    return pygame.transform.scale(image, (x, y))
+
+
+def transform_images(dictionary):
+    for key in dictionary:
+        dictionary[key] = advance_transform_image(dictionary[key])
 
 
 ball1 = load_image('wizard_weapon1.png')
@@ -37,3 +48,5 @@ wizard_images = {
     'move_side2_reverse': pygame.transform.flip(pygame.transform.scale(move_side2, (10 * 3, 15 * 3)), True, False),
     'move_side3_reverse': pygame.transform.flip(pygame.transform.scale(move_side3, (10 * 3, 15 * 3)), True, False),
 }
+
+transform_images(wizard_images)

@@ -11,7 +11,7 @@ start_sprites = pygame.sprite.Group()
 size_set = size
 
 
-class Button(pygame.sprite.Sprite):
+class Button(pygame.sprite.Sprite):  # Button that can carry out click function
     def __init__(self, file_name=None):
         super(Button, self).__init__(start_sprites)
         self.pos_x = 290 * width // 800 + (270 * width // 800 - button_width) // 2
@@ -34,7 +34,7 @@ class Button(pygame.sprite.Sprite):
         return False
 
 
-class ButtonStartGame(Button):
+class ButtonStartGame(Button):  # text if Start Game
     def __init__(self):
         super(ButtonStartGame, self).__init__(file_name='btn_start_game.png')
         self.rect = pygame.Rect(self.pos_x, self.pos_y, button_width, button_height)
@@ -43,7 +43,7 @@ class ButtonStartGame(Button):
         self.image.blit(text, (space_x, self.space_y))
 
 
-class ButtonExitGame(Button):
+class ButtonExitGame(Button):  # text is Exit
     def __init__(self):
         super(ButtonExitGame, self).__init__(file_name='btn_start_game.png')
         pos_y = self.pos_y + button_height + 5
@@ -53,7 +53,7 @@ class ButtonExitGame(Button):
         self.image.blit(text, (space_x, self.space_y))
 
 
-class ButtonSettings(Button):
+class ButtonSettings(Button):  # text is size of the screen
     def __init__(self):
         super(ButtonSettings, self).__init__(file_name='btn_settings.png')
         pos_y = self.pos_y + 2 * button_height + 10
@@ -63,7 +63,7 @@ class ButtonSettings(Button):
         self.image.blit(text, (space_x, self.space_y))
 
 
-class ButtonChoseLevel(Button):
+class ButtonChoseLevel(Button):  # text is the value(index) of the level
     def __init__(self):
         super(ButtonChoseLevel, self).__init__(file_name='btn_choose_level.png')
         pos_y = self.pos_y + 3 * button_height + 15
@@ -73,7 +73,7 @@ class ButtonChoseLevel(Button):
         self.image.blit(text, (space_x, self.space_y))
 
 
-class StartScreen(pygame.sprite.Sprite):
+class StartScreen(pygame.sprite.Sprite):  # background
     def __init__(self):
         super(StartScreen, self).__init__(start_sprites)
         try:
@@ -87,7 +87,7 @@ class StartScreen(pygame.sprite.Sprite):
             pygame.draw.rect(self.image, black, (0, 0, width, height))
 
 
-class InterfaceSettings(pygame.sprite.Sprite):
+class InterfaceSettings(pygame.sprite.Sprite):  # Interface that include some buttons (Settings buttons)
     def __init__(self):
         super(InterfaceSettings, self).__init__(start_sprites)
         settings_width = 400 * width // 800
@@ -170,7 +170,7 @@ class InterfaceSettings(pygame.sprite.Sprite):
             self.message = None
 
 
-class Message(pygame.sprite.Sprite):
+class Message(pygame.sprite.Sprite):  # notification to user
     def __init__(self):
         super(Message, self).__init__(start_sprites)
         space_x = 200 * width // 800
@@ -184,6 +184,7 @@ class Message(pygame.sprite.Sprite):
         self.image = pygame.Surface((self.message_width, self.message_height), pygame.SRCALPHA)
         pygame.draw.rect(self.image, white, (0, 0, self.message_width, self.message_height), 3)
         self.font = pygame.font.Font(None, int(40 * width / 800))
+        # if size of the screen is changed the game should be restarted
         self.text = '   Restart the game for the'
         self.text2 = '    changes to take effect'
         self.exit_btn()
@@ -211,7 +212,7 @@ class Message(pygame.sprite.Sprite):
         return False
 
 
-class ButtonLevel(pygame.sprite.Sprite):
+class ButtonLevel(pygame.sprite.Sprite):  # button which include value(index) of the level and can carry out click func
     def __init__(self, pos, text):
         super(ButtonLevel, self).__init__(start_sprites)
         self.rect = pygame.Rect(pos[0], pos[1], tile_width, tile_height)
@@ -263,14 +264,14 @@ class InterfaceChoseLevel(pygame.sprite.Sprite):
         self.content = []
         self.buttons = []
 
-    def update(self, read_file=False):
+    def update(self, read_file=False):  # read txt file of available(finished) levels
         if not read_file:
             return
         with open('data/levels.txt', 'r') as f_read:
             [self.content.append(el) for el in map(str.strip, f_read.readlines()) if el not in self.content]
             self.output_levels_buttons()
 
-    def output_levels_buttons(self):
+    def output_levels_buttons(self):  # show available levels to select
         box = self.width // tile_width, self.height // tile_height
         space_y = 10 * height // 600
         index = 0
@@ -282,17 +283,17 @@ class InterfaceChoseLevel(pygame.sprite.Sprite):
                     break
                 content = self.content[index]
                 pos_x, pos_y = self.rect.x + tile_width * j, self.rect.y + tile_height * i + self.h2 + space_y
-                btn = ButtonLevel((pos_x, pos_y), content)
+                btn = ButtonLevel((pos_x, pos_y), content)  # create button
                 self.buttons.append(btn)
                 index += 1
 
     def get_click(self, pos):
-        btn = list(filter(lambda x: x.is_clicked(pos), self.buttons))
+        btn = list(filter(lambda x: x.is_clicked(pos), self.buttons))  # filter and check if the button is clicked
         if not btn:
-            return -182
-        return int(btn[0].get_text())
+            return -182  # error
+        return int(btn[0].get_text())  # return value(index) of the level
 
-    def close(self, pos):
+    def close(self, pos):  # if close button is clicked InterfaceChoseLevel will be closed
         if pos[0] in range(self.x + self.x2, self.rect.x + self.width):
             if pos[1] in range(self.rect.y, self.rect.y + self.y2):
                 [btn.kill() for btn in self.buttons]
@@ -300,52 +301,56 @@ class InterfaceChoseLevel(pygame.sprite.Sprite):
 
 
 def start_screen():
-    LEVELS.chose_level(level_chosen=0)
-    StartScreen()
+    LEVELS.chose_level(level_chosen=0)  # standard value (0 is start_level. It can be changed for tests)
+    StartScreen()  # Sprite. It is a picture of the castle
+    # Sprites that contain background and text of the button. If they are clicked they will carry out some functions
     btn_start = ButtonStartGame()
     btn_exit = ButtonExitGame()
     btn_settings = ButtonSettings()
     btn_chose_level = ButtonChoseLevel()
+    # Menu where size of the screen can be selected
     interface_settings = None
+    # Menu where level can be selected
     interface_level = None
-    pygame.mouse.set_visible(True)
+    pygame.mouse.set_visible(True)  # make cursor visible
     while True:
         screen.fill(black)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 exit()
-            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                if not interface_settings and not interface_level:
-                    if btn_start.is_clicked(event.pos):
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # event left button mouse is clicked
+                if not interface_settings and not interface_level:  # check are interfaces opened
+                    if btn_start.is_clicked(event.pos):  # start game
                         screen.fill(black)
+                        # delete all sprites to minimise resources
                         for sprite in start_sprites:
                             sprite.kill()
                         return
-                    if btn_exit.is_clicked(event.pos):
+                    if btn_exit.is_clicked(event.pos):  # close game
                         exit()
-                    if btn_settings.is_clicked(event.pos):
+                    if btn_settings.is_clicked(event.pos):  # interface settings open
                         interface_settings = InterfaceSettings()
-                    if btn_chose_level.is_clicked(event.pos):
+                    if btn_chose_level.is_clicked(event.pos):  # interface level open
                         interface_level = InterfaceChoseLevel()
-                        interface_level.update(read_file=True)
-                elif interface_settings:
-                    if interface_settings.close(event.pos):
+                        interface_level.update(read_file=True)  # levels are saved into file when they are finished
+                elif interface_settings:  # interface is settings opened
+                    if interface_settings.close(event.pos):  # close interface
                         interface_settings.kill()
                         interface_settings = None
-                    if interface_settings:
-                        change_settings = interface_settings.change_settings(event.pos)
-                        if change_settings:
+                    if interface_settings:  # check is interface opened to except error
+                        change_settings = interface_settings.change_settings(event.pos)  # select size of the screen
+                        if change_settings:  # update file with settings
                             with open(settings_file_name, 'w') as f_write:
                                 f_write.writelines('\n'.join(map(str, change_settings)))
                         interface_settings.btn_close_message(event.pos)
-                elif interface_level:
-                    if interface_level.close(event.pos):
+                elif interface_level:  # interface level is opened
+                    if interface_level.close(event.pos):  # close interface
                         interface_level.kill()
                         interface_level = None
-                    if interface_level:
-                        index_level = interface_level.get_click(event.pos)
+                    if interface_level:  # check is interface opened to except error
+                        index_level = interface_level.get_click(event.pos)  # select level
                         if index_level >= 0:
-                            LEVELS.chose_level(level_chosen=index_level)
+                            LEVELS.chose_level(level_chosen=index_level)  # level is selected
 
         start_sprites.draw(screen)
         pygame.display.flip()

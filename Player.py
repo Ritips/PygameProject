@@ -44,14 +44,14 @@ class Player(pygame.sprite.Sprite):
         pygame.draw.rect(image, black, (0, 0, w, h), 3)
         self.hp_bar.image = image
 
-    def update(self, check=None, flag_change_image=0, dmg_dealer=None, **kwargs):
+    def update(self, can_move=True, check=None, flag_change_image=0, dmg_dealer=None, **kwargs):
         if not self.health:
-            self.kill()
+            self.kill(), self.hp_bar.kill(), self.damage_box.kill()
         if check:
             if not flag_change_image % 8:
-                self.move(check=check, flag_change_image=True)
+                self.move(check=check, flag_change_image=True, can_move=can_move)
             else:
-                self.move(check=check)
+                self.move(check=check, can_move=can_move)
         if not self.kd and self.attack:
             self.kd = 1
         elif self.kd == self.kd_reset:
@@ -81,7 +81,7 @@ class Player(pygame.sprite.Sprite):
                     return True
         return False
 
-    def move(self, check=None, flag_change_image=False):
+    def move(self, check=None, flag_change_image=False, can_move=True):
         move_side = any_move = False
         if not check:
             return
@@ -95,7 +95,7 @@ class Player(pygame.sprite.Sprite):
                 return
         if (check[pygame.K_LEFT] or check[pygame.K_a]) and (check[pygame.K_RIGHT] or check[pygame.K_d]):
             pass
-        else:
+        elif can_move:
             if check[pygame.K_LEFT] or check[pygame.K_a]:
                 move_side = True
                 any_move = True
@@ -134,7 +134,7 @@ class Player(pygame.sprite.Sprite):
                         self.hit_animation(reverse=False)
         if (check[pygame.K_UP] or check[pygame.K_w]) and (check[pygame.K_DOWN] or check[pygame.K_s]):
             pass
-        else:
+        elif can_move:
             if check[pygame.K_UP] or check[pygame.K_w]:
                 any_move = True
                 self.rect = self.rect.move(0, -self.speed)

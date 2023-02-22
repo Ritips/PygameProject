@@ -5,7 +5,10 @@ from SETTINGS import width, height
 
 def transform_player_image(image):
     x, y = image.get_size()
-    x, y = int(width * (x + 10) / 800), int(height * (y + 10) / 600)
+    if width == 800 and height == 600:
+        x, y = int(width * (x + 11) / 800), int(height * (y + 11) / 600)
+    else:
+        x, y = int(width * (x + 10) / 800), int(height * (y + 10) / 600)
     return pygame.transform.scale(image, (x, y))
 
 

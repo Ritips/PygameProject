@@ -1,0 +1,8 @@
+freezelevel/book3.txt
+freezelevel/book6.txt
+freezelevel/family.txt
+freezelevel/snowman.txt
+freezelevel/gaily.txt
+freezelevel/content8.txt
+freezelevel/content9.txt
+freezelevel/task1_part2.txt

@@ -1,0 +1,5 @@
+Press E to interact with some objects
+Press B to open inventory
+Press C to pick up objects
+Press LBM to use item in the inventory
+Press RBM to put item in object

@@ -1,0 +1,4 @@
+The bear is white.
+The bird is blue.
+The dog is black.
+The puppy is, too.
