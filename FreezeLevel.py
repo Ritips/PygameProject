@@ -4,7 +4,7 @@ from Constructions import *
 from LoadLevel import *
 from DefinePlayerLevel import *
 from SETTINGS import *
-from FreezeImages import fireplace, bookcase_png, music_system, door
+from FreezeImages import fireplace, bookcase_png, music_system, door, key_image, chest_image
 from WinScreen import win_screen
 from EscMenu import EscMenu
 import pygame
@@ -73,6 +73,22 @@ class CommonObject(pygame.sprite.Sprite):
                 return True
         return False
 
+'''
+class Chest(CommonObject):
+    def __init__(self, pos):
+        super(Chest, self).__init__(pos, groups=(sprites, furniture))
+        self.image = chest_image
+        self.key_contain = True
+
+    def update(self, press_e=False, reset_key=False, **kwargs):
+        if group_player.sprites() in sprites:
+            self.target = group_player.sprites()[0]
+        if press_e and self.key_contain and self.check_pos_player():
+            #  inventory_group.update(item=KeyIcon((0, 0)), chest=self)
+            self.key_contain = False
+        if reset_key:
+            self.key_contain = True
+'''
 
 # for first task (each item should be in each corner)
 class Item(CommonObject):
@@ -286,6 +302,16 @@ class ItemIcon(CellItem):
         Item((x, y))
         inventory_group.update(close_inventory=True)
 
+'''
+class KeyIcon(CellItem):
+    def __init__(self, pos):
+        super(KeyIcon, self).__init__(pos)
+        self.empty = False
+        self.image = pygame.transform.scale(key_image, (60 * width // 800, 50 * height // 600))
+
+    def get_content(self):
+        print('here')
+'''
 
 # to see some items. For instance, book
 class Inventory(pygame.sprite.Sprite):
@@ -309,7 +335,7 @@ class Inventory(pygame.sprite.Sprite):
         [pygame.draw.rect(self.image, light_grey, (i, 0, w_cell, h), w_line) for i in range(0, w, w_cell)]
 
     def update(self, press_b=False, close_inventory=False, click_pos=None,
-               btn_click=None, item=None, item_sprite=None, **kwargs):
+               btn_click=None, item=None, item_sprite=None, chest=None, **kwargs):
         if press_b:
             if other_interface_opened:
                 self.add(sprites)
@@ -330,6 +356,9 @@ class Inventory(pygame.sprite.Sprite):
         if item:
             if self.add_item(item) and item_sprite:
                 item_sprite.kill()
+        '''if chest:
+            if item and not self.add_item(item):
+                chest.update(reset_key=True)'''
 
     def click_cell(self, pos):
         if self.rect.y <= pos[-1] <= self.rect.y + self.rect.h:
@@ -357,11 +386,6 @@ class Inventory(pygame.sprite.Sprite):
             self.redraw_items()
 
 
-# To open the second door
-class Key(pygame.sprite.Sprite):
-    pass
-
-
 # to be honest I don't know for what this class. Maybe it will be a loader and container for txt file
 class Room:
     def __init__(self):
@@ -372,10 +396,13 @@ class Room:
         self.status = False
         self.inventory = None
         self.player = None
+        self.status_load_objects = True
 
     def change_status(self):
         self.status = not self.status
         if not self.status:
+            for sprite in self.room_sprites:
+                constructions.remove(sprite), sprites.remove(sprite), furniture.remove(sprite)
             self.player = self.inventory = None
 
     def set_inventory(self, inventory):
@@ -401,13 +428,23 @@ class Room:
         x, y = len(map_room[0]), len(map_room)
         [WallCastle((j, i)) if map_room[i][j] == 'W' else PathCastle((j, i)) for i in range(y) for j in range(x)]
         group = []
-        for i in range(y):
-            for j in range(x):
-                if map_room[i][j] == 'D':
-                    self.pos = (j * tile_width, i * tile_height)
-                    group.append(Door((j, i), task=1))
-                elif map_room[i][j] == 'F':
-                    group.append(FirePlace((j, i)))
+        if self.status_load_objects:
+            self.status_load_objects = False
+            for i in range(y):
+                for j in range(x):
+                    if map_room[i][j] == 'D':
+                        self.pos = (j * tile_width, i * tile_height)
+                        group.append(Door((j, i), task=1))
+                    elif map_room[i][j] == 'F':
+                        group.append(FirePlace((j, i)))
+                    '''elif map_room[i][j] == 'C':
+                        group.append(Chest((j, i)))'''
+            [self.room_sprites.add(el) for el in group]
+        else:
+            for el in self.room_sprites:
+                if el.__class__ == FirePlace:
+                    constructions.add(el)
+                furniture.add(el), sprites.add(el), group.append(el)
         self.player = Player(self.pos)
         self.inventory.add(inventory_group)
         [el.set_target(self.player) for el in group]
@@ -599,7 +636,7 @@ def complete_task_order():
             bottom = True
     if left and right and bottom:
         return True
-    return False
+    return True
 
 
 def start_freeze_level_game():
