@@ -1,12 +1,13 @@
 from DeathHero import end_screen
 from Player import Player
-from Queen import Queen
 from Constructions import *
 from LoadLevel import *
 from DefinePlayerLevel import *
 from SETTINGS import *
 from WinScreen import win_screen
 from EscMenu import EscMenu
+from trytomakeriddle import *
+from walls_images import escape_path
 import pygame
 
 
@@ -16,26 +17,32 @@ screen = pygame.display.set_mode(size)
 clock = pygame.time.Clock()
 
 
-def draw_level(level_draw=None, index=0):  # draws sprites (player, enemies, walls)
+class EscapePath(pygame.sprite.Sprite):
+    image = escape_path
+
+    def __init__(self, pos):
+        super(EscapePath, self).__init__(sprites)
+        self.rect = pygame.Rect(pos[0] * tile_width, pos[1] * tile_height, tile_width, tile_height)
+        self.image = EscapePath.image
+
+
+def draw_level(level_draw=None, index=0):
     pygame.mixer.music.load('data\\Matrix_3_cut.wav')
     pygame.mixer.music.play(-1, 0.0)
-    if index == 2:
-        x = y = 0
+    if index == 5:
         for i in range(len(level_draw)):
             for j in range(len(level_draw[i])):
                 if level_draw[i][j] == 'W':
-                    WallQueen((j, i))
+                    WallCastle((j, i))
                 else:
-                    PathQueen((j, i))
-                if level_draw[i][j] == 'q':
-                    x, y = j, i
+                    PathCastle((j, i))
+                if level_draw[i][j] == 'E':
+                    EscapePath((j, i))
         player = Player((7 * tile_width, tile_height))
-        queen = Queen((x, y))
-        queen.set_target(player)
-        return purple, player
+        return black, player
 
 
-def start_game():
+def ghost_level_function_game():
     # deleting all previous sprites before drawing new sprites
     [sprite.kill() for sprite in sprites], [construction.kill() for construction in constructions]
     class_level = LEVELS.get_level()  # get level (It is class which is determined in DefinePlayer.py)
@@ -47,12 +54,7 @@ def start_game():
     while running:
         screen.fill(color)
         if player not in sprites:
-            pygame.mixer.music.load('data\\haha.mp3')
-            pygame.mixer.music.play(1, 0.0)
-            return 2  # key for queen_level_game()
-        if not enemies.sprites():
-            LEVELS.finish_level()
-            return 3  # key for queen_level_game()
+            return 2  # key for ghost_level_game()
         if esc_menu:  # is EscMenu opened
             pygame.mouse.set_visible(True)  # make cursor visible
             sprites.draw(screen)
@@ -69,7 +71,7 @@ def start_game():
                         sprites.empty()
                         enemies.empty()
                         group_player.empty()
-                        return 1  # key for queen_level_game()
+                        return 1  # key for ghost_level_game()
                 if event.type == pygame.KEYDOWN and event.key == 27:
                     esc_menu.kill()
                     esc_menu = None
@@ -80,6 +82,13 @@ def start_game():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 exit()
+            if event.type == pygame.KEYDOWN and event.key == 101:
+                x, y, h, w = player.rect
+                if 40 < x < 90 and 40 < y < 90:
+                    pygame.mouse.set_visible(True)
+                    pygame.mixer.music.load('data\\riddlemusic.mp3')
+                    pygame.mixer.music.play(-1, 0.0)
+                    running = start_riddle()
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and not player.check_kd():  # attack
                 player.func_attack(True)
             if event.type == pygame.KEYDOWN and event.key == 27:  # call EscMenu
@@ -99,7 +108,7 @@ def restart():
     if result == 11:
         return 110101  # this key is used to return to the lobby (start screen)
     elif result == 22:
-        return queen_level_game(restart_func=True)  # restart
+        return ghost_level_game(restart_func=True)  # restart
 
 
 def show_win_menu():
@@ -109,11 +118,11 @@ def show_win_menu():
     return 110101  # this key is used to return to the lobby (start screen)
 
 
-def queen_level_game(restart_func=False):
+def ghost_level_game(restart_func=False):
     [sprite.kill() for sprite in sprites]  # delete all sprites to minimise resources
     if not restart_func:  # start menu
         return 110101
-    flag = start_game()
+    flag = ghost_level_function_game()
     if flag == 1:  # start menu
         return 110101
     elif flag == 2:  # restart
@@ -122,5 +131,5 @@ def queen_level_game(restart_func=False):
         return show_win_menu()
 
 
-def queen_level():  # start function
-    return queen_level_game(restart_func=True)
+def ghost_level():  # start function
+    return ghost_level_game(restart_func=True)
