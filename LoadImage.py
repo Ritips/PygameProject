@@ -21,4 +21,3 @@ def load_image(name, color_key=None):
         return image
     except FileNotFoundError:
         raise ValueError(f'File {fullname} not found')
-
