@@ -19,7 +19,7 @@ booster = 1
 def draw_level(level_draw=None, index=0):
     pygame.mixer.music.load('data\\ogo.mp3')
     pygame.mixer.music.play(-1, 0.0)
-    if index == 4:
+    if index == 5:
         return black, None
 
 
