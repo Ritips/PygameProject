@@ -301,6 +301,7 @@ class InterfaceChoseLevel(pygame.sprite.Sprite):
 
 
 def start_screen():
+    pygame.mixer.music.stop()
     LEVELS.chose_level(level_chosen=0)  # standard value (0 is start_level. It can be changed for tests)
     StartScreen()  # Sprite. It is a picture of the castle
     # Sprites that contain background and text of the button. If they are clicked they will carry out some functions
