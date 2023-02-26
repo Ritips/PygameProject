@@ -24,15 +24,15 @@ def draw_level(level_draw=None, index=0):  # draws sprites (player, enemies, wal
         for i in range(len(level_draw)):
             for j in range(len(level_draw[i])):
                 if level_draw[i][j] == 'W':
-                    WallQueen((j, i))
+                    WallCastle((j, i))
                 else:
-                    PathQueen((j, i))
+                    PathCastle((j, i))
                 if level_draw[i][j] == 'q':
                     x, y = j, i
         player = Player((7 * tile_width, tile_height))
         queen = Queen((x, y))
         queen.set_target(player)
-        return purple, player
+        return dark_grey, player
 
 
 def start_game():
