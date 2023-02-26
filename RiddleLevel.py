@@ -29,7 +29,7 @@ class EscapePath(pygame.sprite.Sprite):
 def draw_level(level_draw=None, index=0):
     pygame.mixer.music.load('data\\Matrix_3_cut.wav')
     pygame.mixer.music.play(-1, 0.0)
-    if index == 5:
+    if index == 4:
         for i in range(len(level_draw)):
             for j in range(len(level_draw[i])):
                 if level_draw[i][j] == 'W':
@@ -84,11 +84,13 @@ def ghost_level_function_game():
                 exit()
             if event.type == pygame.KEYDOWN and event.key == 101:
                 x, y, h, w = player.rect
-                if 40 < x < 90 and 40 < y < 90:
+                if 40 * width // 800 < x < 90 * width // 800 and 40 * height // 600 < y < 90 * height // 600:
                     pygame.mouse.set_visible(True)
                     pygame.mixer.music.load('data\\riddlemusic.mp3')
                     pygame.mixer.music.play(-1, 0.0)
                     running = start_riddle()
+                    pygame.mixer.music.load('data\\Matrix_3_cut.wav')
+                    pygame.mixer.music.play(-1, 0.0)
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and not player.check_kd():  # attack
                 player.func_attack(True)
             if event.type == pygame.KEYDOWN and event.key == 27:  # call EscMenu
@@ -100,7 +102,7 @@ def ghost_level_function_game():
         pygame.display.set_caption(str(clock.get_fps()))  # title of the screen
         pygame.display.flip()
         clock.tick(FPS)
-    return 0
+    return 3
 
 
 def restart():
