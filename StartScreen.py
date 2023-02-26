@@ -356,4 +356,3 @@ def start_screen():
         start_sprites.draw(screen)
         pygame.display.flip()
         clock.tick(FPS)
-
