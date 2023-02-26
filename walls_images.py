@@ -16,3 +16,4 @@ second_level_path = [transform_image((load_image('path_level_2_1.png'))),
                      transform_image((load_image('path_level_2_3.png')))]
 second_level_wall = [transform_image((load_image('wall_level_2_1.png'))),
                      transform_image((load_image('wall_level_2_2.png')))]
+escape_path = transform_image(load_image('EscapePath.png'))

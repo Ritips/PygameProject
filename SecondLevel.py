@@ -22,9 +22,9 @@ def draw_level(level_draw=None, index=0):
         for i in range(len(level_draw)):
             for j in range(len(level_draw[i])):
                 if level_draw[i][j] == 'W':
-                    WallCastle((j, i))
+                    LevelSecondWall((j, i))
                 else:
-                    PathCastle((j, i))
+                    LevelSecondPath((j, i))
 
         player = Player((7 * tile_width, tile_height))
         for i in range(len(level_draw)):
@@ -47,6 +47,8 @@ def start_second_level():
     while running:
         screen.fill(color)
         if player not in sprites:
+            pygame.mixer.music.load('data\\haha.mp3')
+            pygame.mixer.music.play(1, 0.0)
             return 2
         if not enemies.sprites():
             LEVELS.finish_level()

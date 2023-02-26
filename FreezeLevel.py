@@ -582,6 +582,8 @@ class InterfaceTaskOrder(pygame.sprite.Sprite):  # Task 2
 
 
 def draw_level(level_draw=None, index=0):  # draws sprites (player, enemies, walls) Main FreezeLevel
+    pygame.mixer.music.load('data\\Matrix_3_cut.wav')
+    pygame.mixer.music.play(-1, 0.0)
     if index == 3:
         y, x = len(level_draw), len(level_draw[0])
         [WallCastle((j, i)) if level_draw[i][j] == 'W' else PathCastle((j, i)) for i in range(y) for j in range(x)]
@@ -673,6 +675,8 @@ def start_freeze_level_game():
             if flag[0] == 2:
                 return 2
         if player not in sprites and not global_value_check_player:
+            pygame.mixer.music.load('data\\haha.mp3')
+            pygame.mixer.music.play(1, 0.0)
             return 2
         if global_value_complete_task2:
             global_value_complete_task2 = False
