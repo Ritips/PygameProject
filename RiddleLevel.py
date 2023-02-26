@@ -102,6 +102,7 @@ def ghost_level_function_game():
         pygame.display.set_caption(str(clock.get_fps()))  # title of the screen
         pygame.display.flip()
         clock.tick(FPS)
+    LEVELS.finish_level()
     return 3
 
 
