@@ -58,15 +58,13 @@ class Valkyrie(pygame.sprite.Sprite):
         damage_box = dmg_dealer.damage_box
         if pygame.sprite.collide_rect(self, damage_box):
             self.hit_amount += 1
-            if self.hit_amount >= 100:
+            if self.hit_amount >= 10:
                 group_player.update(dmg_dealer=dmg_dealer)
             self.health -= dmg_dealer.damage
             if self.health > 0:
                 self.status_self_bar_show = 1
             else:
-                self.health = 0
-                self.status_self_bar_show = False
-                self.kill(), self.health_bar.kill()
+                self.health = 3000
 
     def get_hit_count(self):
         return self.hit_amount
