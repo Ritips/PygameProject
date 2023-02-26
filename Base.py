@@ -5,6 +5,7 @@ from StartLevel import start_level_game
 from LastLevel import start_last_level
 from SecondLevel import second_level
 from FreezeLevel import freeze_level
+from RiddleLevel import ghost_level
 
 
 def main(lobby=True, index=None):  # carry out switching between levels
@@ -39,6 +40,12 @@ def main(lobby=True, index=None):  # carry out switching between levels
         if flag == 110105:
             main(lobby=False, index=4)
     if index == 4:
+        flag = ghost_level()
+        if flag == 110101:
+            main()
+        if flag == 110105:
+            main(lobby=False, index=5)
+    if index == 5:
         flag = start_last_level()
         if flag == 110110:
             main(index=0)
