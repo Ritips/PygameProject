@@ -8,16 +8,10 @@ player_speed = int(2 * height / 600)
 player_width = int(50 * width // 800)
 player_height = int(50 * height // 600)
 
-slime_speed = int(1 * height / 600)
-slime_width = int(15 * width // 800)
-slime_height = int(15 * height // 600)
-
 meteor_width = int(34 * width / 800)
 meteor_height = int(34 * height / 600)
 magic_ball_width = int(20 * width / 800)
 magic_ball_height = int(11 * height / 600)
-
-ghost_width, ghost_height, ghost_speed = player_width, player_height, player_speed
 
 hp_bar_height = 5 * height // 600
 
