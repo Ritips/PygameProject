@@ -1,12 +1,12 @@
 import random
 import time
-
 import pygame
+from SETTINGS import size
 
 
 def start_riddle():
     pygame.init()
-    screen = pygame.display.set_mode((800, 600))
+    screen = pygame.display.set_mode(size)
     task_solved = False
     flag_exit = False
     rectangles = pygame.sprite.Group()
